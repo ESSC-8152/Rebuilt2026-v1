@@ -140,18 +140,20 @@ public final class Constants {
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 
+  public static final class TeleopConstants {
+    public static final double kBasketXRed = 8.75;
+    public static final double kBasketXBlue = 8.75;
+    public static final double kBasketY = 4.0;
+    public static final double kMaxTrackingSpeed = 0.15;
+  }
+
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
   }
-  public static final class towerConstants {
-    public static final double kMaxSpeed = 0.5;
-    public static final double kMinSpeed = 0.2;
-  }
-  public static final class mecanismConstants {
-    public static final double kCameSpeed = 0.6;
-    public static final double kRamasseurBallonSpeed = 0.8;
-    public static final double kRamasseurAngleSpeed = 0.1;
-    public static final double kRamasseurCorailSpeed = 0.4;
+
+  public static final class LedConstants {
+    // PWM port (or DIO/PWM port) used by the Blinkin/Spark LED controller
+    public static final int kBlinkinPwmPort = 0;
   }
 }
 

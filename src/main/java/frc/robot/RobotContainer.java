@@ -6,11 +6,17 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.Constants.AutoConstants;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.TeleopConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.commands.drive.TurnToAngleCommand;
+import frc.robot.subsystems.Blinkin;
+import frc.robot.subsystems.RamasseurSubsystem;
+import frc.robot.commands.leds.SetLedsDefault;
+import frc.robot.commands.leds.SetLedsRamasser;
+import frc.robot.commands.ramasseur.RamasserCommand;
+import frc.robot.commands.ramasseur.StopRamasserCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -27,6 +33,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // Sous-système du châssis (drive)
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final Blinkin m_leds = new Blinkin();
+  private final RamasseurSubsystem m_rammasseur = new RamasseurSubsystem();
 
   // Manette du conducteur
   private final XboxController m_driverController =
@@ -36,6 +44,8 @@ public class RobotContainer {
    * Constructeur : configure les bindings et la commande par défaut.
    */
   public RobotContainer() {
+    m_leds.set(SparkLedPattern.GREEN); // Couleur par défaut
+
     configureButtonBindings();
     configureDefaultCommands();
   }
@@ -76,16 +86,16 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 8)
         .onTrue(new InstantCommand(m_robotDrive::setZeroPosition, m_robotDrive));
 
-    new JoystickButton(m_driverController, 2)
-        .whileTrue(
-            Commands.defer(
-                () -> new TurnToAngleCommand(m_robotDrive, m_robotDrive.getAngleToBasket()),
-                java.util.Set.of(m_robotDrive)));
+    new JoystickButton(m_driverController, 1)
+        .onTrue(Commands.sequence(new RamasserCommand(m_rammasseur), new SetLedsRamasser(m_leds)))
+        .onFalse(Commands.sequence(new StopRamasserCommand(m_rammasseur), new SetLedsDefault(m_leds)));
 
     new Trigger(m_driverController::getLeftBumperButton)
         .whileTrue(new RunCommand(
             () ->
                 {
+                    m_leds.set(SparkLedPattern.COLOR1_STROBE); // Couleur de tracking
+
                     // Vitesses demandées (field-relative)
                     double vx = MathUtil.applyDeadband(
                         m_driverController.getRawAxis(1) * DriveConstants.kVitesse,
@@ -95,8 +105,42 @@ public class RobotContainer {
                         OIConstants.kDriveDeadband);
 
                     // Centre du panier selon l'alliance
-                    double basketY = 4.0;
-                    double basketX = m_robotDrive.isRedAlliance() ? 5.0 : 12.5;
+                    double basketY = TeleopConstants.kBasketY;
+                    double basketX = m_robotDrive.isRedAlliance() ? TeleopConstants.kBasketXRed : TeleopConstants.kBasketXBlue;
+
+                    double px = m_robotDrive.getPose().getX();
+                    double py = m_robotDrive.getPose().getY();
+
+                    double dx = px - basketX;
+                    double dy = py - basketY;
+                    double dist = Math.hypot(dx, dy);
+                    if (dist < 1e-3) dist = 1e-3; // éviter division par zéro
+
+                    double nx = dx / dist;
+                    double ny = dy / dist;
+
+                    // Projection tangentielle : retirer la composante radiale
+                    double radial = vx * nx + vy * ny;
+                    double vxT = vx - radial * nx;
+                    double vyT = vy - radial * ny;
+
+                    // Correction douce pour rester à rayon 2 m
+                    double radiusError = dist - 1.0;
+                    double kR = 0.65; // gain radial
+                    double radialCorr = -kR * radiusError;
+
+                    SmartDashboard.putNumber("Radius Error", radiusError);
+
+                    double vxCmd = vxT + radialCorr * nx;
+                    double vyCmd = vyT + radialCorr * ny;
+
+                    // Clamp de sécurité
+                    vxCmd = MathUtil.clamp(vxCmd, -TeleopConstants.kMaxTrackingSpeed, TeleopConstants.kMaxTrackingSpeed);
+                    vyCmd = MathUtil.clamp(vyCmd, -TeleopConstants.kMaxTrackingSpeed, TeleopConstants.kMaxTrackingSpeed);
+
+                    SmartDashboard.putNumber("Angle to Basket", m_robotDrive.getAngleToBasket().getDegrees());
+
+                    double rotCmd = MathUtil.applyDeadband(m_robotDrive.getCompensationRotation(m_robotDrive.getAngleToBasket().getDegrees()), 0.05);
 
                     Boolean isOnGoodSide = m_robotDrive.isOnGoodSide();
 
@@ -117,44 +161,14 @@ public class RobotContainer {
                       return;   
                     }
 
-                    double px = m_robotDrive.getPose().getX();
-                    double py = m_robotDrive.getPose().getY();
-
-                    double dx = px - basketX;
-                    double dy = py - basketY;
-                    double dist = Math.hypot(dx, dy);
-                    if (dist < 1e-3) dist = 1e-3; // éviter division par zéro
-
-                    double nx = dx / dist;
-                    double ny = dy / dist;
-
-                    // Projection tangentielle : retirer la composante radiale
-                    double radial = vx * nx + vy * ny;
-                    double vxT = vx - radial * nx;
-                    double vyT = vy - radial * ny;
-
-                    // Correction douce pour rester à rayon 2 m
-                    double radiusError = dist - 2.0;
-                    double kR = 0.5; // gain radial
-                    double radialCorr = -kR * radiusError;
-
-                    double vxCmd = vxT + radialCorr * nx;
-                    double vyCmd = vyT + radialCorr * ny;
-
-                    // Clamp de sécurité
-                    vxCmd = MathUtil.clamp(vxCmd, -DriveConstants.kVitesse, DriveConstants.kVitesse);
-                    vyCmd = MathUtil.clamp(vyCmd, -DriveConstants.kVitesse, DriveConstants.kVitesse);
-
-                    double rotCmd = m_robotDrive.getCompensationRotation(m_robotDrive.getAngleToBasket().getDegrees());
-
                     m_robotDrive.conduire(
                         -vxCmd,
                         -vyCmd,
                         rotCmd,
-                        true, // fieldRelative : true si contrôle relatif au terrain
+                        true,
                         false
                         );
                 },
-            m_robotDrive));
+            m_robotDrive)).onFalse(new SetLedsDefault(m_leds));
   }
 }

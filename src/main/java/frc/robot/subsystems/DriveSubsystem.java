@@ -26,11 +26,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.TeleopConstants;
 import frc.robot.LimelightHelpers;
 
 /**
@@ -281,8 +281,9 @@ public class DriveSubsystem extends SubsystemBase {
 			normalizedAngle += 360;
 		}
 
-		// Retourne l'angle en degrés (convention négative pour ce projet)
-		return normalizedAngle - 180;
+		// Retourne l'angle en degrés
+		return DriveConstants.kGyroReversed ? (normalizedAngle - 180) * -1 : (normalizedAngle - 180);
+	
 	}
 
 	public double getRate() {
@@ -367,17 +368,12 @@ public class DriveSubsystem extends SubsystemBase {
 		double robotY = getPose().getY();
 
 		double basketX; 
-		double basketY = 4.0; 
+		double basketY = TeleopConstants.kBasketY; 
 
 		boolean isRed = isRedAlliance();
-		basketX = isRed ? 5.0 : 12.5;
+		basketX = isRed ? TeleopConstants.kBasketXRed : TeleopConstants.kBasketXBlue;
 
-		boolean isOnGoodSide = false;
-		if (isRed) {
-			if (robotX < basketX - 0.2) isOnGoodSide = true;
-		} else {
-			if (robotX > basketX + 0.2) isOnGoodSide = true;
-		}
+		boolean isOnGoodSide = isOnGoodSide();
 
 		if (isOnGoodSide) {
 			double deltaX = basketX - robotX;
@@ -397,7 +393,7 @@ public class DriveSubsystem extends SubsystemBase {
 		double basketX; 
 
 		boolean isRed = isRedAlliance();
-		basketX = isRed ? 5.0 : 12.5;
+		basketX = isRed ? TeleopConstants.kBasketXRed : TeleopConstants.kBasketXBlue;
 
 		boolean isOnGoodSide = isRed ? (robotX < basketX - 0.2) : (robotX > basketX + 0.2);
 

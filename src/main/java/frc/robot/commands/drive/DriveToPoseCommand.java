@@ -5,22 +5,31 @@ import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.AutoConstants;
 
 /**
- * Commande qui crée un pathfinding vers une pose cible en utilisant AutoBuilder.
+ * Utility to create a pathfinding command to a target pose using AutoBuilder.
+ *
+ * Usage:
+ *   Command cmd = DriveToPoseCommand.create(targetPose);
  */
-public class DriveToPoseCommand extends ProxyCommand {
+public final class DriveToPoseCommand {
+    private DriveToPoseCommand() {}
 
-    public DriveToPoseCommand(Pose2d targetPose) {
-        super(() -> AutoBuilder.pathfindToPose(
+    public static Command create(Pose2d targetPose) {
+        return Commands.deferredProxy(() ->
+            AutoBuilder.pathfindToPose(
                 targetPose,
                 new PathConstraints(
-                        AutoConstants.kMaxSpeedMetersPerSecond,
-                        AutoConstants.kMaxAccelerationMetersPerSecondSquared,
-                        Units.degreesToRadians(540),
-                        Units.degreesToRadians(720)),
-                0.0));
+                    AutoConstants.kMaxSpeedMetersPerSecond,
+                    AutoConstants.kMaxAccelerationMetersPerSecondSquared,
+                    Units.degreesToRadians(540),
+                    Units.degreesToRadians(720)
+                ),
+                0.0
+            )
+        );
     }
 }
