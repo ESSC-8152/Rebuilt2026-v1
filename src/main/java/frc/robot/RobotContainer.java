@@ -16,6 +16,7 @@ import frc.robot.subsystems.RamasseurSubsystem;
 import frc.robot.commands.leds.SetLedsDefault;
 import frc.robot.commands.leds.SetLedsRamasser;
 import frc.robot.commands.ramasseur.RamasserCommand;
+import frc.robot.commands.ramasseur.ToggleSortirRamasseurCommand;
 import frc.robot.commands.ramasseur.StopRamasserCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -32,9 +33,9 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // Sous-système du châssis (drive)
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final Blinkin m_leds = new Blinkin();
-  private final RamasseurSubsystem m_rammasseur = new RamasseurSubsystem();
+  final RamasseurSubsystem m_rammasseur = new RamasseurSubsystem();
 
   // Manette du conducteur
   private final XboxController m_driverController =
@@ -68,7 +69,7 @@ public class RobotContainer {
                         m_driverController.getRawAxis(0) * DriveConstants.kVitesse,
                         OIConstants.kDriveDeadband),
                     -MathUtil.applyDeadband(
-                        -m_driverController.getRawAxis(4) * DriveConstants.kVitesseRotation,
+                        m_driverController.getRawAxis(4) * DriveConstants.kVitesseRotation,
                         OIConstants.kDriveDeadband),
                     true, // fieldRelative : true si contrôle relatif au terrain
                     false
@@ -89,6 +90,9 @@ public class RobotContainer {
     new JoystickButton(m_driverController, 1)
         .onTrue(Commands.sequence(new RamasserCommand(m_rammasseur), new SetLedsRamasser(m_leds)))
         .onFalse(Commands.sequence(new StopRamasserCommand(m_rammasseur), new SetLedsDefault(m_leds)));
+
+    new JoystickButton(m_driverController, 2)
+        .onTrue(new ToggleSortirRamasseurCommand(m_rammasseur));
 
     new Trigger(m_driverController::getLeftBumperButton)
         .whileTrue(new RunCommand(

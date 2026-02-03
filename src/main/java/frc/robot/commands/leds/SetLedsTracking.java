@@ -1,12 +1,16 @@
 package frc.robot.commands.leds;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.SparkLedPattern;
 import frc.robot.subsystems.Blinkin;
 
-/** Instant command to set LEDs to the tracking pattern */
-public class SetLedsTracking extends InstantCommand {
+/** Command to set LEDs to the tracking pattern using LedCommand base. */
+public class SetLedsTracking extends LedCommand {
     public SetLedsTracking(Blinkin leds) {
-        super(() -> leds.set(SparkLedPattern.COLOR1_STROBE), leds);
+        super(leds);
+    }
+
+    @Override
+    protected SparkLedPattern getPattern() {
+        return SparkLedPattern.COLOR1_STROBE;
     }
 }

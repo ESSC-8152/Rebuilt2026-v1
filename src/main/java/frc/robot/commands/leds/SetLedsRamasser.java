@@ -1,12 +1,16 @@
 package frc.robot.commands.leds;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.SparkLedPattern;
 import frc.robot.subsystems.Blinkin;
 
-/** Instant command to set LEDs to the "ramasser" (collecting) color */
-public class SetLedsRamasser extends InstantCommand {
+/** Command to set LEDs to the "ramasser" (collecting) color using LedCommand base. */
+public class SetLedsRamasser extends LedCommand {
     public SetLedsRamasser(Blinkin leds) {
-        super(() -> leds.set(SparkLedPattern.RED), leds);
+        super(leds);
+    }
+
+    @Override
+    protected SparkLedPattern getPattern() {
+        return SparkLedPattern.RED;
     }
 }

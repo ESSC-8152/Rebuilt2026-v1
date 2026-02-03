@@ -24,7 +24,6 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
-
     m_robotContainer = new RobotContainer();
   }
 
@@ -70,7 +69,10 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    
+    m_robotContainer.m_rammasseur.rentrerRamasseur();
   }
+  
 
   /** This function is called periodically during operator control. */
   @Override

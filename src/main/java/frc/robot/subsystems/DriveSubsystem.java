@@ -109,25 +109,7 @@ public class DriveSubsystem extends SubsystemBase {
 			throw new RuntimeException("Failed to load RobotConfig from GUI settings", e);
 		}
 
-		AutoBuilder.configure(
-            this::getPose,
-            this::resetPose,
-            this::getRobotRelativeSpeeds,
-            (speeds, feedforwards) -> conduireChassis(speeds),
-            new PPHolonomicDriveController(
-                    new PIDConstants(1.5, 0.0, 0.0),
-                    new PIDConstants(6, 0.0, 0.05)
-            ),
-            config,
-            () -> {
-                var alliance = DriverStation.getAlliance();
-                if (alliance.isPresent()) {
-                    return alliance.get() == DriverStation.Alliance.Red;
-                }
-                return false;
-            },
-            this
-    	);
+		configureAutoBuilder(config);
 
 		PathPlannerLogging.setLogActivePathCallback((poses) -> {
 			field2d.getObject("activePath").setPoses(poses);
@@ -191,10 +173,14 @@ public class DriveSubsystem extends SubsystemBase {
 		// Inversion seulement si field-relative
 		double invert = (fieldRelative && isRedAlliance()) ? -1.0 : 1.0;
 
-		ChassisSpeeds speeds = fieldRelative
-				? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedMeters * invert, ySpeedMeters * invert, rotRad,
-						getPose().getRotation())
-				: new ChassisSpeeds(xSpeedMeters, ySpeedMeters, rotRad);
+	// Use the instantaneous gyro angle for field-relative conversion rather than
+	// the pose estimator. The pose estimator can be corrected by vision and
+	// therefore lag or differ from the gyro; using it here can produce
+	// unexpected drive behavior on the real robot.
+	ChassisSpeeds speeds = fieldRelative
+		? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedMeters * invert, ySpeedMeters * invert, rotRad,
+			Rotation2d.fromDegrees(getAngle()))
+		: new ChassisSpeeds(xSpeedMeters, ySpeedMeters, rotRad);
 
 		setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds));
 	}
@@ -241,7 +227,16 @@ public class DriveSubsystem extends SubsystemBase {
 		// Paramètres de confiance pour la mesure vision
 		poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
 
-		LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(nomComplet);
+		// Use the alliance-aware Limelight helper so the pose is reported in the
+		// correct field coordinate system (wpiblue or wpired). Previously this
+		// always requested the blue frame which made the robot think it was on
+		// the wrong alliance when on red.
+		LimelightHelpers.PoseEstimate poseEstimate;
+		if (isRedAlliance()) {
+			poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(nomComplet);
+		} else {
+			poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(nomComplet);
+		}
 		if (poseEstimate == null) {
 			return;
 		}
@@ -275,15 +270,7 @@ public class DriveSubsystem extends SubsystemBase {
 	// ----- Gyro -----
 
 	public double getAngle() {
-		double normalizedAngle = (m_gyro.getAngle() + 180) % 360;
-
-		if (normalizedAngle <= 0) {
-			normalizedAngle += 360;
-		}
-
-		// Retourne l'angle en degrés
-		return DriveConstants.kGyroReversed ? (normalizedAngle - 180) * -1 : (normalizedAngle - 180);
-	
+		return m_gyro.getAngle();
 	}
 
 	public double getRate() {
@@ -456,5 +443,24 @@ public class DriveSubsystem extends SubsystemBase {
 
 	public PIDController getXController() {
 		return xController;
+	}
+
+	public void configureAutoBuilder(RobotConfig config) {
+		AutoBuilder.configure(
+            this::getPose,
+            this::resetPose,
+            this::getRobotRelativeSpeeds,
+            (speeds, feedforwards) -> conduireChassis(speeds),
+            new PPHolonomicDriveController(
+                    new PIDConstants(1.5, 0.0, 0.0),
+                    new PIDConstants(6, 0.0, 0.05)
+            ),
+            config,
+            () -> {
+                if (isRedAlliance()) return true;
+				else return false;
+            },
+            this
+    	);
 	}
 }
