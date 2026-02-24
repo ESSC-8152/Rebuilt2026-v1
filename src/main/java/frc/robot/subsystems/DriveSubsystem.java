@@ -69,6 +69,15 @@ public class DriveSubsystem extends SubsystemBase {
 	// ----- Affichage sur le terrain -----
 	private final Field2d field2d = new Field2d();
 
+	// One-time alliance-based startup reset. We wait until the Driver Station
+	// reports an alliance (not present when the robot boots standalone) and
+	// then apply the deterministic starting pose. This avoids applying the
+	// wrong starting heading when DS/FMS isn't connected at boot.
+	private boolean allianceInitDone = false;
+
+	// (Removed runtime vision inversion flags — we fix the root cause by
+	// ensuring the robot orientation sent to the Limelight matches the
+	// coordinate convention expected by the camera.)
 	// ----- Contrôleurs PID pour conduite vers une pose -----
 	private final PIDController xController = new PIDController(1.5, 0.0, 0.0); // m/s per m
 	private final PIDController yController = new PIDController(1.5, 0.0, 0.0); // m/s per m
@@ -90,8 +99,10 @@ public class DriveSubsystem extends SubsystemBase {
 						arriereGauche.getPosition(), arriereDroite.getPosition() },
 				Pose2d.kZero);
 
-		// Réinitialiser l'odométrie à l'origine par défaut
-		resetOdometry(new Pose2d());
+	// Réinitialiser l'odométrie à l'origine par défaut mais aligner
+	// l'orientation avec le gyro instantané afin d'avoir la bonne
+	// heading au démarrage.
+	resetOdometry(new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(getAngle())));
 
 		// Configurer les PID
 		thetaController.enableContinuousInput(-180.0, 180.0);
@@ -128,11 +139,24 @@ public class DriveSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("Angle Gyro", getAngle());
 		SmartDashboard.putNumber("Pose Estimator X", getPose().getX());
 		SmartDashboard.putNumber("Pose Estimator Y", getPose().getY());
-		SmartDashboard.putNumber("Pose Estimator Theta", getPose().getRotation().getDegrees());
-
-		// Intégration Limelight (position/orientation)
-		setLimelightRobotOrientation();
+		SmartDashboard.putNumber("Pose Estimator Theta", getPose().getRotation().getDegrees());	
+		
 		addVisionPosition("limelight");
+
+		// If we haven't applied the alliance-based starting pose yet, wait until
+		// the DriverStation reports an alliance (present when DS/FMS connected)
+		// and then apply resetToAllianceStartingPose exactly once.
+		if (!allianceInitDone) {
+			var maybeAlliance = DriverStation.getAlliance();
+			if (maybeAlliance.isPresent()) {
+				// Apply deterministic start pose (0° blue / 180° red)
+				resetToAllianceStartingPose();
+				allianceInitDone = true;
+				SmartDashboard.putString("AllianceInit", maybeAlliance.get() == Alliance.Red ? "Red applied" : "Blue applied");
+			} else {
+				SmartDashboard.putString("AllianceInit", "Waiting for DS");
+			}
+		} 
 
 		// Mettre à jour la vue Field2d
 		field2d.setRobotPose(getPose());
@@ -170,20 +194,17 @@ public class DriveSubsystem extends SubsystemBase {
 		double ySpeedMeters = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
 		double rotRad = rot * DriveConstants.kMaxAngularSpeed;
 
-		// Inversion seulement si field-relative
-		double invert = (fieldRelative && isRedAlliance()) ? -1.0 : 1.0;
+		// Use the instantaneous gyro angle for field-relative conversion rather than
+		// the pose estimator. The pose estimator can be corrected by vision and
+		// therefore lag or differ from the gyro; using it here can produce
+		// unexpected drive behavior on the real robot.
+		ChassisSpeeds speeds = fieldRelative
+			? ChassisSpeeds.fromFieldRelativeSpeeds(-xSpeedMeters, -ySpeedMeters, rotRad,
+				Rotation2d.fromDegrees(getAngle()))
+			: new ChassisSpeeds(xSpeedMeters, ySpeedMeters, rotRad);
 
-	// Use the instantaneous gyro angle for field-relative conversion rather than
-	// the pose estimator. The pose estimator can be corrected by vision and
-	// therefore lag or differ from the gyro; using it here can produce
-	// unexpected drive behavior on the real robot.
-	ChassisSpeeds speeds = fieldRelative
-		? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedMeters * invert, ySpeedMeters * invert, rotRad,
-			Rotation2d.fromDegrees(getAngle()))
-		: new ChassisSpeeds(xSpeedMeters, ySpeedMeters, rotRad);
-
-		setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds));
-	}
+			setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds));
+		}
 
 	public void stop() {
 		// Mettre des vitesses nulles aux moteurs
@@ -219,27 +240,18 @@ public class DriveSubsystem extends SubsystemBase {
 
 	// ----- Limelight helpers -----
 
-	public void setLimelightRobotOrientation() {
-		LimelightHelpers.SetRobotOrientation("limelight", getPose().getRotation().getDegrees(), 0, 0, 0, 0, 0);
-	}
-
 	public void addVisionPosition(String nomComplet) {
+		double yaw = isRedAlliance() ? getAngle() : getAngle() + 180;
+		LimelightHelpers.SetRobotOrientation("limelight", yaw, 0, 0, 0, 0, 0);
+
 		// Paramètres de confiance pour la mesure vision
-		poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.7, 0.7, 9999999));
+		poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 9999999));
 
 		// Use the alliance-aware Limelight helper so the pose is reported in the
 		// correct field coordinate system (wpiblue or wpired). Previously this
 		// always requested the blue frame which made the robot think it was on
 		// the wrong alliance when on red.
-		LimelightHelpers.PoseEstimate poseEstimate;
-		if (isRedAlliance()) {
-			poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(nomComplet);
-		} else {
-			poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(nomComplet);
-		}
-		if (poseEstimate == null) {
-			return;
-		}
+		LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(nomComplet);
 
 		boolean doRejectUpdate = false;
 		if (Math.abs(getRate()) > 720) {
@@ -250,12 +262,42 @@ public class DriveSubsystem extends SubsystemBase {
 		}
 		SmartDashboard.putBoolean(nomComplet, !doRejectUpdate);
 		if (!doRejectUpdate) {
-			poseEstimator.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
+			// Publish raw vision pose for diagnosis
+			SmartDashboard.putNumber(nomComplet + " Raw Vision X", poseEstimate.pose.getX());
+			SmartDashboard.putNumber(nomComplet + " Raw Vision Y", poseEstimate.pose.getY());
+			SmartDashboard.putNumber(nomComplet + " Raw Vision Theta", poseEstimate.pose.getRotation().getDegrees());
+
+			// Use the pose directly from Limelight (no runtime inversion hacks).
+			Pose2d usedPose = poseEstimate.pose;
+
+			SmartDashboard.putNumber(nomComplet + " Used Vision X", usedPose.getX());
+			SmartDashboard.putNumber(nomComplet + " Used Vision Y", usedPose.getY());
+			SmartDashboard.putNumber(nomComplet + " Used Vision Theta", usedPose.getRotation().getDegrees());
+
+			poseEstimator.addVisionMeasurement(usedPose, poseEstimate.timestampSeconds);
 		}
 	}
 
 	public void setZeroPosition() {
-		resetOdometry(new Pose2d());
+		resetOdometry(new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(getAngle())));
+	}
+
+	/**
+	 * Reset the odometry to a sensible starting pose depending on alliance.
+	 * On the red alliance we rotate the starting heading by 180 degrees so the
+	 * robot appears in the mirrored orientation on the Field2d.
+	 *
+	 * This uses the robot's current alliance as reported by DriverStation.
+	 */
+	public void resetToAllianceStartingPose() {
+		// For a deterministic match start, set the starting heading relative
+		// to the alliance: 0° when on Blue (facing Blue wall), 180° when on
+		// Red (facing Red wall). This mirrors the FRC field convention and
+		// ensures Field2d shows the expected orientation at the start of the
+		// match regardless of gyro zeroing differences.
+		double startHeading = isRedAlliance() ? 180.0 : 0.0;
+		Pose2d start = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(startHeading));
+		resetOdometry(start);
 	}
 
 	// ----- Encodeurs -----
@@ -425,11 +467,11 @@ public class DriveSubsystem extends SubsystemBase {
 
 		double pidOutput = thetaController.calculate(currentAngle, targetAngleDegrees);
 
-		pidOutput += Math.signum(pidOutput) * 0.05; 
+		pidOutput += Math.signum(pidOutput) * 0.005; 
 
-		// Clamp critique : on force la valeur entre -0.5 et 0.5 (50% de Vmax)
+		// Clamp critique : on force la valeur entre -0.50 et 0.50 (50% de Vmax)
 		// Cela empêche le robot de recevoir une demande de 400% de vitesse.
-		double rotationInput = MathUtil.clamp(pidOutput, -0.5, 0.5);
+		double rotationInput = MathUtil.clamp(pidOutput, -0.50, 0.50);
 
 		return rotationInput;
 	}
@@ -457,8 +499,7 @@ public class DriveSubsystem extends SubsystemBase {
             ),
             config,
             () -> {
-                if (isRedAlliance()) return true;
-				else return false;
+                return true;
             },
             this
     	);

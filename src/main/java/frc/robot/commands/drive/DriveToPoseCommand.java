@@ -25,8 +25,8 @@ public final class DriveToPoseCommand {
                 new PathConstraints(
                     AutoConstants.kMaxSpeedMetersPerSecond,
                     AutoConstants.kMaxAccelerationMetersPerSecondSquared,
-                    Units.degreesToRadians(540),
-                    Units.degreesToRadians(720)
+                    Units.degreesToRadians(90),
+                    Units.degreesToRadians(180)
                 ),
                 0.0
             )

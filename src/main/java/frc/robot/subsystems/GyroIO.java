@@ -60,6 +60,25 @@ public class GyroIO {
     }
 
     /**
+     * Returns the raw yaw value directly from the sensor (no kGyroReversed applied).
+     * Useful for diagnostics to distinguish sensor wiring/initialization issues
+     * from sign conventions applied by the code.
+     */
+    public double getRawAngle() {
+        if (m_realGyro != null) {
+            return m_realGyro.getYaw();
+        }
+        return m_simYaw;
+    }
+
+    /**
+     * Indicates whether a real gyro (NavX) was initialized.
+     */
+    public boolean hasGyro() {
+        return m_realGyro != null;
+    }
+
+    /**
      * Retourne la vitesse angulaire actuelle (deg/s).
      * En simulation basique, retourne 0.0 si aucun capteur réel n'est présent.
      *

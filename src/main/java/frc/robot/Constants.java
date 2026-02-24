@@ -27,8 +27,8 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kVitesse = 0.35;
-    public static final double kVitesseRotation = 0.35;
+    public static final double kVitesse = 0.2;
+    public static final double kVitesseRotation = 0.2;
 
     public static final double kMaxSpeedMetersPerSecond = 4.8;
     public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
@@ -38,9 +38,9 @@ public final class Constants {
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(22.5);
+    public static final double kTrackWidth = Units.inchesToMeters(22);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(27.5);
+    public static final double kWheelBase = Units.inchesToMeters(27);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -152,8 +152,22 @@ public final class Constants {
   }
 
   public static final class LedConstants {
-    // PWM port (or DIO/PWM port) used by the Blinkin/Spark LED controller
+    // Port du REVBlinkinLedController
     public static final int kBlinkinPwmPort = 0;
+  }
+
+  public static final class RamasseurConstants {
+    // PID Ajuster le P pour la vitesse de rétraction/extension
+    public static final double kRotationP = 1.0;
+    public static final double kRotationI = 0.0;
+    public static final double kRotationD = 0.0;
+
+    // Limite de courant (Amp)
+    public static final int kRotationCurrentLimit = 30; 
+
+    // Position setpoints de l'encoder (radians)
+    public static final double kExtendedPosition = 2.2;
+    public static final double kRetractedPosition = 4.5;
   }
 }
 

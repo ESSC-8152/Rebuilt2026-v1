@@ -11,6 +11,6 @@ public class SetLedsTracking extends LedCommand {
 
     @Override
     protected SparkLedPattern getPattern() {
-        return SparkLedPattern.COLOR1_STROBE;
+        return SparkLedPattern.RED;
     }
 }
