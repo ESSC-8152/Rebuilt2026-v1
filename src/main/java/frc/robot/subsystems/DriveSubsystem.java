@@ -254,12 +254,18 @@ public class DriveSubsystem extends SubsystemBase {
 		LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(nomComplet);
 
 		boolean doRejectUpdate = false;
+
+		if (poseEstimate == null){
+			return;
+		}
 		if (Math.abs(getRate()) > 720) {
 			doRejectUpdate = true;
 		}
 		if (poseEstimate.tagCount == 0) {
 			doRejectUpdate = true;
 		}
+		
+		
 		SmartDashboard.putBoolean(nomComplet, !doRejectUpdate);
 		if (!doRejectUpdate) {
 			// Publish raw vision pose for diagnosis

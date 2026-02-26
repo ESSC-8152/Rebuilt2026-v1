@@ -22,6 +22,8 @@ public class LanceurSubsystem extends SubsystemBase{
     private final SparkFlexConfig lanceurConfig;
     private final SparkFlexConfig feederConfig;
 
+    private boolean lanceurEnMarche = false;
+
     public LanceurSubsystem(){
         moteurGaucheLanceur = new SparkFlex(11, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
         moteurDroitLanceur = new SparkFlex(12, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
@@ -40,7 +42,9 @@ public class LanceurSubsystem extends SubsystemBase{
         
         lanceurConfig
             .idleMode(IdleMode.kCoast)
-            .smartCurrentLimit(30);
+            .smartCurrentLimit(40)
+            .openLoopRampRate(0)
+            .closedLoopRampRate(0);
 
         lanceurConfig.closedLoop
             .feedbackSensor(com.revrobotics.spark.FeedbackSensor.kPrimaryEncoder)
@@ -48,7 +52,7 @@ public class LanceurSubsystem extends SubsystemBase{
             .i(0.0)
             .d(0.0)
             .outputRange(-1, 1)
-            .feedForward.kV(0.00016);
+            .feedForward.kV(0.00015);
 
         lanceurConfig.signals
             .primaryEncoderVelocityPeriodMs(20);
@@ -80,16 +84,18 @@ public class LanceurSubsystem extends SubsystemBase{
         moteurFeeder.configure(feederConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    public void startLanceur(){
-        lanceurPidController.setSetpoint(100, ControlType.kVelocity);
-    }
-
-    public void arreterLanceur(){
-        lanceurPidController.setSetpoint(0, ControlType.kVelocity);
+    public void toggleLanceur(){
+        if(lanceurEnMarche){
+            lanceurPidController.setSetpoint(0, ControlType.kVelocity);
+            lanceurEnMarche = false;
+        } else {
+            lanceurPidController.setSetpoint(3000, ControlType.kVelocity);
+            lanceurEnMarche = true;
+        }
     }
 
     public void startFeeder(){
-        feederPidController.setSetpoint(-3000, ControlType.kVelocity);
+        feederPidController.setSetpoint(1500, ControlType.kVelocity);
     }
 
     public void arreterFeeder(){

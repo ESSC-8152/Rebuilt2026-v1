@@ -21,12 +21,12 @@ import frc.robot.subsystems.LanceurSubsystem;
 import frc.robot.subsystems.Blinkin;
 import frc.robot.subsystems.RamasseurSubsystem;
 import frc.robot.commands.drive.DriveToPoseCommand;
-import frc.robot.commands.lanceur.StopLanceurCommand;
-import frc.robot.commands.lanceur.StartLanceurCommand;
+import frc.robot.commands.lanceur.ToggleLanceurCommand;
+import frc.robot.commands.lanceur.StartFeederCommand;
+import frc.robot.commands.lanceur.StopFeederCommand;
 import frc.robot.commands.leds.SetLedsDefault;
 import frc.robot.commands.leds.SetLedsRamasser;
 import frc.robot.commands.ramasseur.RamasserCommand;
-import frc.robot.commands.ramasseur.ToggleSortirRamasseurCommand;
 import frc.robot.commands.ramasseur.StopRamasserCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -120,11 +120,11 @@ public class RobotContainer {
                 .onFalse(Commands.sequence(new StopRamasserCommand(m_rammasseur), new SetLedsDefault(m_leds)));
 
         new JoystickButton(m_driverController, 2)
-                .onTrue(new ToggleSortirRamasseurCommand(m_rammasseur));
+                .onTrue(new ToggleLanceurCommand(m_lanceur));
 
-        new JoystickButton(m_driverController, 3)
-                .onTrue(new StartLanceurCommand(m_lanceur))
-                .onFalse(new StopLanceurCommand(m_lanceur));
+        new JoystickButton(m_driverController, 4)
+                .onTrue(new StartFeederCommand(m_lanceur))
+                .onFalse(new StopFeederCommand(m_lanceur));
 
         new Trigger(m_driverController::getRightBumperButton)
                 .onTrue(DriveToPoseCommand.create(new Pose2d(7.7877356522024925, 5.115507523646952, new Rotation2d(Math.toRadians(25.559982054158734)))));
