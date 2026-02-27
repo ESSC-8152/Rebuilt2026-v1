@@ -95,7 +95,7 @@ public class LanceurSubsystem extends SubsystemBase{
     }
 
     public void startFeeder(){
-        feederPidController.setSetpoint(1500, ControlType.kVelocity);
+        feederPidController.setSetpoint(2000, ControlType.kVelocity);
     }
 
     public void arreterFeeder(){

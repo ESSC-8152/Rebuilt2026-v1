@@ -28,6 +28,7 @@ import frc.robot.commands.leds.SetLedsDefault;
 import frc.robot.commands.leds.SetLedsRamasser;
 import frc.robot.commands.ramasseur.RamasserCommand;
 import frc.robot.commands.ramasseur.StopRamasserCommand;
+import frc.robot.commands.ramasseur.ToggleSortirRamasseurCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -67,6 +68,10 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Ramasse", Commands.sequence(new RamasserCommand(m_rammasseur), new SetLedsRamasser(m_leds)));
         NamedCommands.registerCommand("ArreteRamasse", Commands.sequence(new StopRamasserCommand(m_rammasseur), new SetLedsDefault(m_leds)));
+        NamedCommands.registerCommand("ToggleLanceur", new ToggleLanceurCommand(m_lanceur));
+        NamedCommands.registerCommand("Feed", new StartFeederCommand(m_lanceur));
+        NamedCommands.registerCommand("StopFeeder", new StopFeederCommand(m_lanceur));
+        NamedCommands.registerCommand("ToggleRamasseur", new ToggleSortirRamasseurCommand(m_rammasseur));
 
         configureButtonBindings();
         configureDefaultCommands();
@@ -74,10 +79,6 @@ public class RobotContainer {
         autoChooser = AutoBuilder.buildAutoChooser();
 
         SmartDashboard.putData("Auto Chooser", autoChooser);
-
-                // Do NOT reset the alliance starting pose here; the Driver Station may not
-                // be connected at constructor time. DriveSubsystem will wait and apply the
-                // alliance-based starting pose once the DS/FMS reports the alliance.
     }
 
     /**
