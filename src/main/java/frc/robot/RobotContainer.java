@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.TeleopConstants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LanceurSubsystem;
 import frc.robot.subsystems.Blinkin;
@@ -147,11 +147,11 @@ public class RobotContainer {
                                                     OIConstants.kDriveDeadband);
 
                                     // Centre du panier selon l'alliance
-                                    double basketY = TeleopConstants.kBasketY;
+                                    double basketY = AutoConstants.kBasketY;
                                     double basketX =
                                             m_robotDrive.isRedAlliance()
-                                                    ? TeleopConstants.kBasketXRed
-                                                    : TeleopConstants.kBasketXBlue;
+                                                    ? AutoConstants.kBasketXRed
+                                                    : AutoConstants.kBasketXBlue;
 
                                     double px = m_robotDrive.getPose().getX();
                                     double py = m_robotDrive.getPose().getY();
@@ -182,10 +182,10 @@ public class RobotContainer {
                                     // Clamp de sécurité
                                     vxCmd =
                                             MathUtil.clamp(
-                                                    vxCmd, -TeleopConstants.kMaxTrackingSpeed, TeleopConstants.kMaxTrackingSpeed);
+                                                    vxCmd, -0.15, 0.15);
                                     vyCmd =
                                             MathUtil.clamp(
-                                                    vyCmd, -TeleopConstants.kMaxTrackingSpeed, TeleopConstants.kMaxTrackingSpeed);
+                                                    vyCmd, -0.15, 0.15);
 
                                     SmartDashboard.putNumber("Angle to Basket", m_robotDrive.getAngleToBasket().getDegrees());
 

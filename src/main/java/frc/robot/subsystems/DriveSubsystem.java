@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.TeleopConstants;
 import frc.robot.LimelightHelpers;
 
 /**
@@ -403,10 +402,10 @@ public class DriveSubsystem extends SubsystemBase {
 		double robotY = getPose().getY();
 
 		double basketX; 
-		double basketY = TeleopConstants.kBasketY; 
+		double basketY = AutoConstants.kBasketY; 
 
 		boolean isRed = isRedAlliance();
-		basketX = isRed ? TeleopConstants.kBasketXRed : TeleopConstants.kBasketXBlue;
+		basketX = isRed ? AutoConstants.kBasketXRed : AutoConstants.kBasketXBlue;
 
 		boolean isOnGoodSide = isOnGoodSide();
 
@@ -428,7 +427,7 @@ public class DriveSubsystem extends SubsystemBase {
 		double basketX; 
 
 		boolean isRed = isRedAlliance();
-		basketX = isRed ? TeleopConstants.kBasketXRed : TeleopConstants.kBasketXBlue;
+		basketX = isRed ? AutoConstants.kBasketXRed : AutoConstants.kBasketXBlue;
 
 		boolean isOnGoodSide = isRed ? (robotX < basketX - 0.2) : (robotX > basketX + 0.2);
 

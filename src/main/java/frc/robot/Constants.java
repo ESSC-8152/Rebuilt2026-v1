@@ -38,9 +38,9 @@ public final class Constants {
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(22);
+    public static final double kTrackWidth = Units.inchesToMeters(25);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(27);
+    public static final double kWheelBase = Units.inchesToMeters(23);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -65,7 +65,7 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 2;
     public static final int kRearRightTurningCanId = 8;
 
-    public static final boolean kGyroReversed = true; // Passage de false a true le 26 fevrier
+    public static final boolean kGyroReversed = true;
   }
 
   public static final class ModuleConstants {
@@ -115,7 +115,7 @@ public final class Constants {
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDrivingMotorCurrentLimit = 50; // amps
+    public static final int kDrivingMotorCurrentLimit = 40; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 
@@ -135,16 +135,13 @@ public final class Constants {
     public static final double kPYController = 1.0;
     public static final double kPThetaController = 1.0;
 
-    // Constraint for the motion profiled robot angle controller
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
-        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-  }
-
-  public static final class TeleopConstants {
     public static final double kBasketXRed = 8.75;
     public static final double kBasketXBlue = 8.75;
     public static final double kBasketY = 4.0;
-    public static final double kMaxTrackingSpeed = 0.15;
+
+    // Constraint for the motion profiled robot angle controller
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
+        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 
   public static final class NeoMotorConstants {
@@ -166,8 +163,8 @@ public final class Constants {
     public static final int kRotationCurrentLimit = 30; 
 
     // Position setpoints de l'encoder (radians)
-    public static final double kExtendedPosition = 2.2;
-    public static final double kRetractedPosition = 4.5;
+    public static final double kExtendedPosition = 0;
+    public static final double kRetractedPosition = 0;
   }
 }
 
