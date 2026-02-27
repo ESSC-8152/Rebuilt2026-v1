@@ -154,6 +154,10 @@ public final class Constants {
   }
 
   public static final class RamasseurConstants {
+    // ID des moteurs
+    public static int kMoteurRamasseurID = 9;
+    public static int kMoteurRotationRamasseurID = 10;
+
     // PID Ajuster le P pour la vitesse de rétraction/extension
     public static final double kRotationP = 1.0;
     public static final double kRotationI = 0.0;
@@ -161,6 +165,9 @@ public final class Constants {
 
     // Limite de courant (Amp)
     public static final int kRotationCurrentLimit = 30; 
+
+    // Vitesse de rotation du ramasseur (rpm)
+    public static final int kVitesseRamasseur = 2000;
 
     // Position setpoints de l'encoder (radians)
     public static final double kExtendedPosition = 0;
