@@ -141,7 +141,8 @@ public class DriveSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("Pose Estimator Y", getPose().getY());
 		SmartDashboard.putNumber("Pose Estimator Theta", getPose().getRotation().getDegrees());	
 		
-		addVisionPosition("limelight");
+		addVisionPosition("limelight-front");
+		addVisionPosition("limelight-back");
 
 		// If we haven't applied the alliance-based starting pose yet, wait until
 		// the DriverStation reports an alliance (present when DS/FMS connected)
@@ -239,10 +240,9 @@ public class DriveSubsystem extends SubsystemBase {
 	}
 
 	// ----- Limelight helpers -----
-
 	public void addVisionPosition(String nomComplet) {
 		double yaw = isRedAlliance() ? getAngle() : getAngle() + 180;
-		LimelightHelpers.SetRobotOrientation("limelight", yaw, 0, 0, 0, 0, 0);
+		LimelightHelpers.SetRobotOrientation(nomComplet, yaw, 0, 0, 0, 0, 0);
 
 		// Paramètres de confiance pour la mesure vision
 		poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 9999999));
