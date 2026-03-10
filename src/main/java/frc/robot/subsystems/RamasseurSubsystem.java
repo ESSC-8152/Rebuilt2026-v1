@@ -4,6 +4,7 @@ import frc.robot.Constants.RamasseurConstants;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -14,6 +15,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class RamasseurSubsystem extends SubsystemBase{
@@ -27,6 +29,7 @@ public class RamasseurSubsystem extends SubsystemBase{
     private final SparkMaxConfig rotationRamasseurConfig;
 
     public boolean isRamasseurDeployed = false;
+    private double targetPosition = 0;
 
     public RamasseurSubsystem(){
         moteurRamasseur = new SparkFlex(RamasseurConstants.kMoteurRamasseurID, MotorType.kBrushless);
@@ -40,9 +43,15 @@ public class RamasseurSubsystem extends SubsystemBase{
 
         double turningFactor = 2 * Math.PI;
 
+        ramasseurConfig
+            .smartCurrentLimit(40)
+            .idleMode(IdleMode.kBrake)
+            .inverted(true);
+
         ramasseurConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(0.0)
+            // Ajoutez un petit gain P (à tester et ajuster progressivement)
+            .p(0.0008) 
             .i(0.0)
             .d(0.0)
             .outputRange(-1, 1)
@@ -52,22 +61,32 @@ public class RamasseurSubsystem extends SubsystemBase{
             .primaryEncoderVelocityPeriodMs(20);
 
     rotationRamasseurConfig
+            .inverted(true)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(RamasseurConstants.kRotationCurrentLimit);
-        rotationRamasseurConfig.absoluteEncoder
-                .positionConversionFactor(turningFactor) // radians
-                .velocityConversionFactor(turningFactor / 60.0); // radians per second
-    rotationRamasseurConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+            .smartCurrentLimit(RamasseurConstants.kRotationCurrentLimit)
+            .openLoopRampRate(2)
+            .closedLoopRampRate(2);
 
-        .pid(RamasseurConstants.kRotationP, RamasseurConstants.kRotationI, RamasseurConstants.kRotationD)
-        .outputRange(-1, 1)
-                // Enable PID wrap around for the turning motor. This will allow the PID
-                // controller to go through 0 to get to the setpoint i.e. going from 350 degrees
-                // to 10 degrees will go through 0 rather than the other direction which is a
-                // longer route.
-                .positionWrappingEnabled(true)
-                .positionWrappingInputRange(0, turningFactor);
+    rotationRamasseurConfig.absoluteEncoder
+            .positionConversionFactor(turningFactor) // radians
+            .velocityConversionFactor(turningFactor / 60.0); // radians par seconde
+
+        rotationRamasseurConfig
+            .openLoopRampRate(0.0)
+            .closedLoopRampRate(0.0); 
+
+        rotationRamasseurConfig.closedLoop
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+            .positionWrappingEnabled(true)
+            .positionWrappingInputRange(0, turningFactor)
+
+            // --- SLOT 0 : Mouvement normal
+            .pid(RamasseurConstants.kRotationP, RamasseurConstants.kRotationI, RamasseurConstants.kRotationD, ClosedLoopSlot.kSlot0)
+            .outputRange(-0.6, 0.6, ClosedLoopSlot.kSlot0)
+
+            // --- SLOT 1 : Coup
+            .pid(0.8, 0, 0.6, ClosedLoopSlot.kSlot1) 
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
 
         moteurRamasseur.configure(ramasseurConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         moteurRotationRamasseur.configure(rotationRamasseurConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -79,15 +98,33 @@ public class RamasseurSubsystem extends SubsystemBase{
 
     public void rentrerRamasseur(){
         isRamasseurDeployed = false;
-        rotationRamasseurPidController.setSetpoint(RamasseurConstants.kRetractedPosition, ControlType.kPosition);
+        targetPosition = RamasseurConstants.kRetractedPosition;
+        rotationRamasseurPidController.setSetpoint(targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
     public void sortirRamasseur(){
         isRamasseurDeployed = true;
-        rotationRamasseurPidController.setSetpoint(RamasseurConstants.kExtendedPosition, ControlType.kPosition);
+        targetPosition = RamasseurConstants.kExtendedPosition;
+        rotationRamasseurPidController.setSetpoint(targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0);
+    }
+    
+    public void kickRamasseur(){
+        if (!isRamasseurDeployed) return;
+
+        targetPosition = RamasseurConstants.kMidPosition;
+        rotationRamasseurPidController.setSetpoint(targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot1);
+    }
+
+    public boolean isAtPosition(){
+        double current = moteurRotationRamasseur.getAbsoluteEncoder().getPosition();
+
+        SmartDashboard.putNumber("Encoder position",current);
+        SmartDashboard.putNumber("Target", targetPosition);
+
+        return Math.abs(targetPosition - current) < 0.1 ? true : false;
     }
 
     public void stop(){
-        moteurRamasseur.stopMotor();
+        moteurRamasseur.set(0);
     }
 }

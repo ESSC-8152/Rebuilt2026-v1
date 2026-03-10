@@ -23,7 +23,7 @@ public class ToggleSortirRamasseurCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return true; // Command finishes immediately
+        return ramasseurSubsystem.isAtPosition();
     }
     
 }

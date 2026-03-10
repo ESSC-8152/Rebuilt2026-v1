@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.LanceurConstants;
 
 public class LanceurSubsystem extends SubsystemBase{
     private final SparkFlex moteurGaucheLanceur;
@@ -25,10 +26,10 @@ public class LanceurSubsystem extends SubsystemBase{
     private boolean lanceurEnMarche = false;
 
     public LanceurSubsystem(){
-        moteurGaucheLanceur = new SparkFlex(11, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-        moteurDroitLanceur = new SparkFlex(12, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+        moteurGaucheLanceur = new SparkFlex(LanceurConstants.kMoteurGaucheLanceurID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+        moteurDroitLanceur = new SparkFlex(LanceurConstants.kMoteurDroitLanceurID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
 
-        moteurFeeder = new SparkFlex(13, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+        moteurFeeder = new SparkFlex(LanceurConstants.kMoteurFeederID, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
 
         feederPidController = moteurFeeder.getClosedLoopController();
         lanceurPidController = moteurGaucheLanceur.getClosedLoopController();
@@ -89,13 +90,13 @@ public class LanceurSubsystem extends SubsystemBase{
             lanceurPidController.setSetpoint(0, ControlType.kVelocity);
             lanceurEnMarche = false;
         } else {
-            lanceurPidController.setSetpoint(3000, ControlType.kVelocity);
+            lanceurPidController.setSetpoint(LanceurConstants.kVitesseLanceur, ControlType.kVelocity);
             lanceurEnMarche = true;
         }
     }
 
     public void startFeeder(){
-        feederPidController.setSetpoint(2000, ControlType.kVelocity);
+        feederPidController.setSetpoint(LanceurConstants.kVitesseFeeder, ControlType.kVelocity);
     }
 
     public void arreterFeeder(){

@@ -29,6 +29,7 @@ import frc.robot.commands.leds.SetLedsRamasser;
 import frc.robot.commands.ramasseur.RamasserCommand;
 import frc.robot.commands.ramasseur.StopRamasserCommand;
 import frc.robot.commands.ramasseur.ToggleSortirRamasseurCommand;
+import frc.robot.commands.ramasseur.kickRamasseurCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -59,6 +60,10 @@ public class RobotContainer {
     // Manette du conducteur
     private final XboxController m_driverController =
             new XboxController(OIConstants.kDriverControllerPort);
+
+    // Manette du copilote
+    private final XboxController m_copiloteController = 
+            new XboxController(OIConstants.kCopiloteControllerPort);
 
     /**
      * Constructeur : configure les bindings et la commande par défaut.
@@ -112,23 +117,22 @@ public class RobotContainer {
      * - Bouton 1 : lancer la commande de déplacement vers une Pose fixe.
      */
     private void configureButtonBindings() {
-        // Quand on appuie (onTrue) sur le bouton 8, exécuter instantanément resetToAllianceStartingPose()
-        new JoystickButton(m_driverController, 8)
-                .onTrue(new InstantCommand(m_robotDrive::resetToAllianceStartingPose, m_robotDrive));
-
-        new JoystickButton(m_driverController, 1)
+        new JoystickButton(m_copiloteController, 1)
                 .onTrue(Commands.sequence(new RamasserCommand(m_rammasseur), new SetLedsRamasser(m_leds)))
                 .onFalse(Commands.sequence(new StopRamasserCommand(m_rammasseur), new SetLedsDefault(m_leds)));
 
-        new JoystickButton(m_driverController, 2)
+        new JoystickButton(m_copiloteController, 2)
                 .onTrue(new ToggleLanceurCommand(m_lanceur));
 
-        new JoystickButton(m_driverController, 4)
+        new JoystickButton(m_copiloteController, 3)
+                .onTrue(new ToggleSortirRamasseurCommand(m_rammasseur));
+
+        new JoystickButton(m_copiloteController, 4)
                 .onTrue(new StartFeederCommand(m_lanceur))
                 .onFalse(new StopFeederCommand(m_lanceur));
 
-        new Trigger(m_driverController::getRightBumperButton)
-                .onTrue(DriveToPoseCommand.create(new Pose2d(7.7877356522024925, 5.115507523646952, new Rotation2d(Math.toRadians(25.559982054158734)))));
+        new Trigger(m_copiloteController::getRightBumperButton)
+                .onTrue(new kickRamasseurCommand(m_rammasseur));
 
         new Trigger(m_driverController::getLeftBumperButton)
                 .whileTrue(

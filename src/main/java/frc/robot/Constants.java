@@ -153,13 +153,24 @@ public final class Constants {
     public static final int kBlinkinPwmPort = 0;
   }
 
+  public static final class LanceurConstants {
+    // ID des moteurs
+    public static final int kMoteurGaucheLanceurID = 11;
+    public static final int kMoteurDroitLanceurID = 12;
+    public static final int kMoteurFeederID = 13;
+
+    // Vitesses (rpm)
+    public static final int kVitesseLanceur = 3000;
+    public static final int kVitesseFeeder = 2000;
+  }
+
   public static final class RamasseurConstants {
     // ID des moteurs
-    public static int kMoteurRamasseurID = 9;
-    public static int kMoteurRotationRamasseurID = 10;
+    public static final int kMoteurRamasseurID = 9;
+    public static final int kMoteurRotationRamasseurID = 10;
 
     // PID Ajuster le P pour la vitesse de rétraction/extension
-    public static final double kRotationP = 1.0;
+    public static final double kRotationP = 0.6;
     public static final double kRotationI = 0.0;
     public static final double kRotationD = 0.0;
 
@@ -167,11 +178,12 @@ public final class Constants {
     public static final int kRotationCurrentLimit = 30; 
 
     // Vitesse de rotation du ramasseur (rpm)
-    public static final int kVitesseRamasseur = 2000;
+    public static final int kVitesseRamasseur = 3000;
 
     // Position setpoints de l'encoder (radians)
-    public static final double kExtendedPosition = 0;
+    public static final double kExtendedPosition = 1.9;
     public static final double kRetractedPosition = 0;
+    public static final double kMidPosition = Math.PI/3;
   }
 }
 
