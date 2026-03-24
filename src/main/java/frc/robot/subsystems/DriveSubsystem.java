@@ -198,6 +198,10 @@ public class DriveSubsystem extends SubsystemBase {
 		// the pose estimator. The pose estimator can be corrected by vision and
 		// therefore lag or differ from the gyro; using it here can produce
 		// unexpected drive behavior on the real robot.
+		// Expect inputs xSpeed/ySpeed to already follow the robot's forward-positive
+		// convention (inversion of joystick handled in RobotContainer). Do not
+		// negate again here — pass the computed meters/sec directly into the
+		// field-relative conversion.
 		ChassisSpeeds speeds = fieldRelative
 			? ChassisSpeeds.fromFieldRelativeSpeeds(-xSpeedMeters, -ySpeedMeters, rotRad,
 				Rotation2d.fromDegrees(getAngle()))
@@ -361,27 +365,6 @@ public class DriveSubsystem extends SubsystemBase {
 		}
 	}
 
-	@Override
-    public void simulationPeriodic() {
-        // Calcul théorique
-        ChassisSpeeds robotSpeeds = DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
-        double angularVelocityDeg = Units.radiansToDegrees(robotSpeeds.omegaRadiansPerSecond);
-        double angleChange = angularVelocityDeg * 0.02;
-
-		avantGauche.simulationPeriodic(0.02);
-		avantDroite.simulationPeriodic(0.02);
-		arriereGauche.simulationPeriodic(0.02);
-		arriereDroite.simulationPeriodic(0.02);
-
-        // Mise à jour via le Wrapper
-        // On récupère l'ancien angle simulé via getAngle(), on ajoute le delta
-        // Attention aux signes : getAngle() retourne déjà l'inverse (-yaw) dans ta logique
-        double currentSimAngle = m_gyro.getAngle(); 
-        
-        // Logique simplifiée pour la sim :
-        m_gyro.setSimYaw(currentSimAngle + angleChange); // ou -angleChange selon ta convention CCW/CW
-    }
-
 	public Command driveToPoseCommand(Pose2d targetPose) {
 		PathConstraints constraints = new PathConstraints(
 				AutoConstants.kMaxSpeedMetersPerSecond, 
@@ -395,7 +378,6 @@ public class DriveSubsystem extends SubsystemBase {
 				0.0 
 		);
 	}
-	
 
 	public Rotation2d getAngleToBasket() {
 		double robotX = getPose().getX();

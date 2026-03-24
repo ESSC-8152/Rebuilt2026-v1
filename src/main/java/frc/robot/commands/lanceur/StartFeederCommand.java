@@ -14,7 +14,7 @@ public class StartFeederCommand extends Command{
 
     @Override
     public void initialize() {
-        m_lanceur.startFeeder();
+        m_lanceur.startFeeder(1.0);
     }
 
     @Override

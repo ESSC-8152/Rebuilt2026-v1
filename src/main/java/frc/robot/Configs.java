@@ -15,10 +15,11 @@ public final class Configs {
             double drivingFactor = ModuleConstants.kWheelDiameterMeters * Math.PI
                     / ModuleConstants.kDrivingMotorReduction;
             double turningFactor = 2 * Math.PI;
-            double drivingVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeedRps;
+            double drivingVelocityFeedForward = 12 / ModuleConstants.kDriveWheelFreeSpeedRps;
         
             drivingConfig
                     .idleMode(ModuleConstants.kDrivingMotorIdleMode)
+                    .voltageCompensation(12.0)
                     .smartCurrentLimit(ModuleConstants.kDrivingMotorCurrentLimit);
             drivingConfig.encoder
                     .positionConversionFactor(drivingFactor) // meters
@@ -31,6 +32,7 @@ public final class Configs {
 
             turningConfig
                     .idleMode(ModuleConstants.kTurningMotorIdleMode)
+                    .voltageCompensation(12.0)
                     .smartCurrentLimit(ModuleConstants.kTurningMotorCurrentLimit);
             turningConfig.absoluteEncoder
                     // Invert the turning encoder, since the output shaft rotates in the opposite

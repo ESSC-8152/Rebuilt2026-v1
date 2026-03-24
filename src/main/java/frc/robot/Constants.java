@@ -25,13 +25,8 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static final class DriveConstants {
-    // Driving Parameters - Note that these are not the maximum capable speeds of
-    // the robot, rather the allowed maximum speeds
-    public static final double kVitesse = 0.2;
-    public static final double kVitesseRotation = 0.2;
-
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
-    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    public static final double kMaxSpeedMetersPerSecond = 2;
+    public static final double kMaxAngularSpeed = Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.2; // radians per second
     public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
@@ -135,8 +130,8 @@ public final class Constants {
     public static final double kPYController = 1.0;
     public static final double kPThetaController = 1.0;
 
-    public static final double kBasketXRed = 8.75;
-    public static final double kBasketXBlue = 8.75;
+    public static final double kBasketXRed = 4.6256;
+    public static final double kBasketXBlue = 11.9154;
     public static final double kBasketY = 4.0;
 
     // Constraint for the motion profiled robot angle controller
@@ -160,8 +155,11 @@ public final class Constants {
     public static final int kMoteurFeederID = 13;
 
     // Vitesses (rpm)
+    public static final int kVitesseLanceurLent = 500;
     public static final int kVitesseLanceur = 3000;
-    public static final int kVitesseFeeder = 2000;
+    public static final int kVitesseFeeder = 5000;
+    public static final double kVitesseCourroies = 3500;
+    public static final int kMoteurFeederBaseID = 14;
   }
 
   public static final class RamasseurConstants {
@@ -175,10 +173,10 @@ public final class Constants {
     public static final double kRotationD = 0.0;
 
     // Limite de courant (Amp)
-    public static final int kRotationCurrentLimit = 30; 
+    public static final int kRotationCurrentLimit = 30;
 
     // Vitesse de rotation du ramasseur (rpm)
-    public static final int kVitesseRamasseur = 3000;
+    public static final int kVitesseRamasseur = 5250;
 
     // Position setpoints de l'encoder (radians)
     public static final double kExtendedPosition = 1.9;
