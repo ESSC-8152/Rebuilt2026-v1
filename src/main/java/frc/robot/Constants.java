@@ -28,10 +28,6 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 2;
     public static final double kMaxAngularSpeed = Math.PI; // radians per second
 
-    public static final double kDirectionSlewRate = 1.2; // radians per second
-    public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
-    public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
-
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(25);
     // Distance between centers of right and left wheels on robot
@@ -141,6 +137,10 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
+  }
+
+  public static final class VortexMotorConstants {
+    public static final double kVortexMotorFreeSpeedRpm = 6784;
   }
 
   public static final class LedConstants {

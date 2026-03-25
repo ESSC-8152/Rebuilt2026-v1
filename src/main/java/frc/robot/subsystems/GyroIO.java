@@ -31,14 +31,8 @@ public class GyroIO {
             try {
                 m_realGyro = new AHRS(NavXComType.kMXP_SPI);
             } catch (RuntimeException e) {
-                // Ne pas propager l'exception pour éviter d'empêcher le démarrage du code.
-                // L'utilisateur/gestionnaire supérieur peut vérifier que l'instance est null.
-                System.out.println("NavX initialization error: " + e.getMessage());
             }
-        } else {
-            // En simulation, le capteur réel n'est pas initialisé.
-            System.out.println("Simulation mode: NavX not initialized.");
-        }
+        } 
     }
 
     /**

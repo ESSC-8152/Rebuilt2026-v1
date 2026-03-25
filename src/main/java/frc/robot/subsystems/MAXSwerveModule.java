@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.configs.DriveConfigs;
 
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
@@ -17,8 +18,6 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
-
-import frc.robot.Configs;
 
 ///////Librairie de REV.
 public class MAXSwerveModule {
@@ -54,9 +53,9 @@ public class MAXSwerveModule {
     // Apply the respective configurations to the SPARKS. Reset parameters before
     // applying the configuration to bring the SPARK to a known good state. Persist
     // the settings to the SPARK to avoid losing them on a power cycle.
-    m_drivingSpark.configure(Configs.MAXSwerveModule.drivingConfig, ResetMode.kResetSafeParameters,
+    m_drivingSpark.configure(DriveConfigs.MAXSwerveModule.drivingConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
-    m_turningSpark.configure(Configs.MAXSwerveModule.turningConfig, ResetMode.kResetSafeParameters,
+    m_turningSpark.configure(DriveConfigs.MAXSwerveModule.turningConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
   // The chassisAngularOffset passed in Constants is already in radians.

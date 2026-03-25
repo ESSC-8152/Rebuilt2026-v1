@@ -5,12 +5,11 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LanceurConstants;
+import frc.robot.configs.LanceurConfigs;
 
 public class LanceurSubsystem extends SubsystemBase {
     private final SparkFlex moteurGaucheLanceur;
@@ -22,9 +21,7 @@ public class LanceurSubsystem extends SubsystemBase {
     private final SparkClosedLoopController lanceurPidController;
     private final SparkClosedLoopController feederPidController;
 
-    private final SparkFlexConfig lanceurConfig;
-    private final SparkFlexConfig feederConfig;
-    private final SparkFlexConfig courroiesConfig;
+
 
     private boolean lanceurEnMarche = false;
 
@@ -51,39 +48,17 @@ public class LanceurSubsystem extends SubsystemBase {
         feederPidController = moteurFeeder.getClosedLoopController();
         lanceurPidController = moteurGaucheLanceur.getClosedLoopController();
 
-        lanceurConfig = new SparkFlexConfig();
-        feederConfig = new SparkFlexConfig();
-        courroiesConfig = new SparkFlexConfig();
-
         // --------------------------------------------------------------
         // Configuration du lanceur (grosses roues)
         // --------------------------------------------------------------
-        lanceurConfig
-            .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(60)
-            .voltageCompensation(12.0);
-
-        lanceurConfig.closedLoop
-            .feedbackSensor(com.revrobotics.spark.FeedbackSensor.kPrimaryEncoder)
-            .p(0.00001)
-            .i(0.0)
-            .d(0.0)
-            .outputRange(-1, 1)
-            .feedForward.kV(0.001769);
-
-        lanceurConfig.signals
-            .primaryEncoderVelocityPeriodMs(20);
-
         moteurGaucheLanceur.configure(
-            lanceurConfig,
+            LanceurConfigs.LanceurSubsystem.lanceurGaucheConfig,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters
         );
 
-        lanceurConfig.follow(moteurGaucheLanceur, true);
-
         moteurDroitLanceur.configure(
-            lanceurConfig,
+            LanceurConfigs.LanceurSubsystem.lanceurDroitConfig,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters
         );
@@ -91,24 +66,8 @@ public class LanceurSubsystem extends SubsystemBase {
         // --------------------------------------------------------------
         // Configuration du feeder (petite roue bleue)
         // --------------------------------------------------------------
-        feederConfig
-            .idleMode(IdleMode.kBrake)
-            .voltageCompensation(12.0)
-            .smartCurrentLimit(40);
-
-        feederConfig.closedLoop
-            .feedbackSensor(com.revrobotics.spark.FeedbackSensor.kPrimaryEncoder)
-            .p(0.0)
-            .i(0.0)
-            .d(0.0)
-            .outputRange(-1, 1)
-            .feedForward.kV(0.001769);
-
-        feederConfig.signals
-            .primaryEncoderVelocityPeriodMs(20);
-
         moteurFeeder.configure(
-            feederConfig,
+            LanceurConfigs.LanceurSubsystem.feederConfig,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters
         );
@@ -116,25 +75,8 @@ public class LanceurSubsystem extends SubsystemBase {
         // --------------------------------------------------------------
         // Configuration des courroies (courroies du feeder)
         // --------------------------------------------------------------
-        courroiesConfig
-            .idleMode(IdleMode.kCoast)
-            .voltageCompensation(12.0)
-            .smartCurrentLimit(30)
-            .inverted(true);
-
-        courroiesConfig.closedLoop
-            .feedbackSensor(com.revrobotics.spark.FeedbackSensor.kPrimaryEncoder)
-            .p(0.0001)
-            .i(0.0)
-            .d(0.0)
-            .outputRange(-1, 1)
-            .feedForward.kV(0.001769);
-
-        courroiesConfig.signals
-            .primaryEncoderVelocityPeriodMs(20);
-
         moteurCourroies.configure(
-            courroiesConfig,
+            LanceurConfigs.LanceurSubsystem.courroiesConfig,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters
         );
