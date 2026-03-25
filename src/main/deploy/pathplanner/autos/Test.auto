@@ -71,27 +71,9 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "kick"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "kick"
+            "name": "Ramasse"
           }
         },
         {
@@ -109,7 +91,19 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 3.0
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "kick"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
           }
         },
         {
@@ -122,6 +116,12 @@
           "type": "named",
           "data": {
             "name": "StopFeeder"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArreteRamasse"
           }
         }
       ]
