@@ -25,22 +25,17 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static final class DriveConstants {
-    // Driving Parameters - Note that these are not the maximum capable speeds of
-    // the robot, rather the allowed maximum speeds
-    public static final double kVitesse = 0.35;
-    public static final double kVitesseRotation = 0.35;
-
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
-    public static final double kMaxAngularSpeed = 2 * Math.PI; // radians per second
+    public static final double kMaxSpeedMetersPerSecond = 2;
+    public static final double kMaxAngularSpeed = Math.PI; // radians per second
 
     public static final double kDirectionSlewRate = 1.2; // radians per second
     public static final double kMagnitudeSlewRate = 1.8; // percent per second (1 = 100%)
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(22.5);
+    public static final double kTrackWidth = Units.inchesToMeters(25);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(27.5);
+    public static final double kWheelBase = Units.inchesToMeters(23);
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -65,7 +60,7 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 2;
     public static final int kRearRightTurningCanId = 8;
 
-    public static final boolean kGyroReversed = true; // Passage de false a true le 26 fevrier
+    public static final boolean kGyroReversed = true;
   }
 
   public static final class ModuleConstants {
@@ -115,7 +110,7 @@ public final class Constants {
     public static final IdleMode kDrivingMotorIdleMode = IdleMode.kBrake;
     public static final IdleMode kTurningMotorIdleMode = IdleMode.kBrake;
 
-    public static final int kDrivingMotorCurrentLimit = 50; // amps
+    public static final int kDrivingMotorCurrentLimit = 40; // amps
     public static final int kTurningMotorCurrentLimit = 20; // amps
   }
 
@@ -135,6 +130,10 @@ public final class Constants {
     public static final double kPYController = 1.0;
     public static final double kPThetaController = 1.0;
 
+    public static final double kBasketXRed = 4.6256;
+    public static final double kBasketXBlue = 11.9154;
+    public static final double kBasketY = 4.0;
+
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
         kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
@@ -143,15 +142,46 @@ public final class Constants {
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
   }
-  public static final class towerConstants {
-    public static final double kMaxSpeed = 0.5;
-    public static final double kMinSpeed = 0.2;
+
+  public static final class LedConstants {
+    // Port du REVBlinkinLedController
+    public static final int kBlinkinPwmPort = 0;
   }
-  public static final class mecanismConstants {
-    public static final double kCameSpeed = 0.6;
-    public static final double kRamasseurBallonSpeed = 0.8;
-    public static final double kRamasseurAngleSpeed = 0.1;
-    public static final double kRamasseurCorailSpeed = 0.4;
+
+  public static final class LanceurConstants {
+    // ID des moteurs
+    public static final int kMoteurGaucheLanceurID = 11;
+    public static final int kMoteurDroitLanceurID = 12;
+    public static final int kMoteurFeederID = 13;
+
+    // Vitesses (rpm)
+    public static final int kVitesseLanceurLent = 500;
+    public static final int kVitesseLanceur = 3000;
+    public static final int kVitesseFeeder = 5000;
+    public static final double kVitesseCourroies = 3500;
+    public static final int kMoteurFeederBaseID = 14;
+  }
+
+  public static final class RamasseurConstants {
+    // ID des moteurs
+    public static final int kMoteurRamasseurID = 9;
+    public static final int kMoteurRotationRamasseurID = 10;
+
+    // PID Ajuster le P pour la vitesse de rétraction/extension
+    public static final double kRotationP = 0.6;
+    public static final double kRotationI = 0.0;
+    public static final double kRotationD = 0.0;
+
+    // Limite de courant (Amp)
+    public static final int kRotationCurrentLimit = 30;
+
+    // Vitesse de rotation du ramasseur (rpm)
+    public static final int kVitesseRamasseur = 5250;
+
+    // Position setpoints de l'encoder (radians)
+    public static final double kExtendedPosition = 1.9;
+    public static final double kRetractedPosition = 0;
+    public static final double kMidPosition = Math.PI/3;
   }
 }
 

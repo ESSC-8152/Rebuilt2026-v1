@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.FeedbackSensor;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ModuleConstants;
 
@@ -16,23 +15,25 @@ public final class Configs {
             double drivingFactor = ModuleConstants.kWheelDiameterMeters * Math.PI
                     / ModuleConstants.kDrivingMotorReduction;
             double turningFactor = 2 * Math.PI;
-            double drivingVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeedRps;
+            double drivingVelocityFeedForward = 12 / ModuleConstants.kDriveWheelFreeSpeedRps;
         
             drivingConfig
-                    .idleMode(IdleMode.kBrake)
-                    .smartCurrentLimit(50);
+                    .idleMode(ModuleConstants.kDrivingMotorIdleMode)
+                    .voltageCompensation(12.0)
+                    .smartCurrentLimit(ModuleConstants.kDrivingMotorCurrentLimit);
             drivingConfig.encoder
                     .positionConversionFactor(drivingFactor) // meters
                     .velocityConversionFactor(drivingFactor / 60.0); // meters per second
             drivingConfig.closedLoop
                     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                    .pid(0.04, 0, 0)
+                    .pid(ModuleConstants.kDrivingP, ModuleConstants.kDrivingI, ModuleConstants.kDrivingD)
                     .outputRange(-1, 1)
                     .feedForward.kV(drivingVelocityFeedForward);
 
             turningConfig
-                    .idleMode(IdleMode.kBrake)
-                    .smartCurrentLimit(20);
+                    .idleMode(ModuleConstants.kTurningMotorIdleMode)
+                    .voltageCompensation(12.0)
+                    .smartCurrentLimit(ModuleConstants.kTurningMotorCurrentLimit);
             turningConfig.absoluteEncoder
                     // Invert the turning encoder, since the output shaft rotates in the opposite
                     // direction of the steering motor in the MAXSwerve Module.
@@ -42,7 +43,7 @@ public final class Configs {
             turningConfig.closedLoop
                     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
                     // These are example gains you may need to them for your own robot!
-                    .pid(1, 0, 0)
+                    .pid(ModuleConstants.kTurningP, ModuleConstants.kTurningI, ModuleConstants.kTurningD)
                     .outputRange(-1, 1)
                     // Enable PID wrap around for the turning motor. This will allow the PID
                     // controller to go through 0 to get to the setpoint i.e. going from 350 degrees

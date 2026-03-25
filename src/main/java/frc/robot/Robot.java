@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  @SuppressWarnings("unused")
   private final RobotContainer m_robotContainer;
 
   /**
@@ -24,8 +23,6 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
   }
 
@@ -55,7 +52,12 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
+    // schedule the autonomous command (example)
+    if (m_autonomousCommand != null) {
+      CommandScheduler.getInstance().schedule(m_autonomousCommand);
+    }
   }
 
   /** This function is called periodically during autonomous. */
@@ -72,6 +74,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
   }
+  
 
   /** This function is called periodically during operator control. */
   @Override

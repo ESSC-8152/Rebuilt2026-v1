@@ -1,77 +1,133 @@
 package frc.robot.subsystems;
 
+import frc.robot.Constants.RamasseurConstants;
+
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class RamasseurSubsystem extends SubsystemBase{
-    private final SparkFlex shaftInterieur;
-    private final SparkFlex shaftExterieur;
+public class RamasseurSubsystem extends SubsystemBase {
+    private final SparkFlex moteurRamasseur;
+    private final SparkMax moteurRotationRamasseur;
 
-    private final SparkClosedLoopController interieurPidController;
-    private final SparkClosedLoopController exterieurPidController;
+    private final SparkClosedLoopController ramasseurPidController;
+    private final SparkClosedLoopController rotationRamasseurPidController;
 
-    private final SparkFlexConfig interieurConfig;
-    private final SparkFlexConfig exterieurConfig;
+    private final SparkFlexConfig ramasseurConfig;
+    private final SparkMaxConfig rotationRamasseurConfig;
 
-    public RamasseurSubsystem(){
-        shaftInterieur = new SparkFlex(9, MotorType.kBrushless);
-        shaftExterieur = new SparkFlex(10, MotorType.kBrushless);
+    public boolean isRamasseurDeployed = false;
+    private double targetPosition = 0;
 
-        interieurPidController = shaftInterieur.getClosedLoopController();
-        exterieurPidController = shaftExterieur.getClosedLoopController();
+    public RamasseurSubsystem() {
+        moteurRamasseur = new SparkFlex(RamasseurConstants.kMoteurRamasseurID, MotorType.kBrushless);
+        moteurRotationRamasseur = new SparkMax(RamasseurConstants.kMoteurRotationRamasseurID, MotorType.kBrushless);
 
-        interieurConfig = new SparkFlexConfig();
-        exterieurConfig = new SparkFlexConfig();
+        ramasseurPidController = moteurRamasseur.getClosedLoopController();
+        rotationRamasseurPidController = moteurRotationRamasseur.getClosedLoopController();
 
-        interieurConfig.closedLoop
+        ramasseurConfig = new SparkFlexConfig();
+        rotationRamasseurConfig = new SparkMaxConfig();
+
+        double turningFactor = 2 * Math.PI;
+
+        ramasseurConfig
+            .smartCurrentLimit(40)
+            .idleMode(IdleMode.kBrake)
+            .inverted(true)
+            .voltageCompensation(12.0);
+
+        ramasseurConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(0.0001)
+            .p(0.00008)
             .i(0.0)
             .d(0.0)
             .outputRange(-1, 1)
-            .feedForward.kV(0.00016);
+            .feedForward.kV(0.001768);
 
-        interieurConfig.signals
+        ramasseurConfig.signals
             .primaryEncoderVelocityPeriodMs(20);
 
-        exterieurConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(0.0001)
-            .i(0.0)
-            .d(0.0)
-            .outputRange(-1, 1)
-            .feedForward.kV(0.00016);
+        rotationRamasseurConfig
+            .inverted(true)
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(RamasseurConstants.kRotationCurrentLimit)
+            .voltageCompensation(12.0)
+            .openLoopRampRate(2)
+            .closedLoopRampRate(2);
 
-        exterieurConfig.signals
-            .primaryEncoderVelocityPeriodMs(20);
-        shaftInterieur.configure(interieurConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        shaftExterieur.configure(exterieurConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rotationRamasseurConfig.absoluteEncoder
+            .positionConversionFactor(turningFactor) // radians
+            .velocityConversionFactor(turningFactor / 60.0); // radians par seconde
+
+        rotationRamasseurConfig
+            .openLoopRampRate(0.0)
+            .closedLoopRampRate(0.0);
+
+        rotationRamasseurConfig.closedLoop
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+            .positionWrappingEnabled(true)
+            .positionWrappingInputRange(0, turningFactor)
+
+            // --- SLOT 0 : Mouvement normal
+            .pid(RamasseurConstants.kRotationP, RamasseurConstants.kRotationI, RamasseurConstants.kRotationD, ClosedLoopSlot.kSlot0)
+            .outputRange(-0.6, 0.6, ClosedLoopSlot.kSlot0)
+
+            // --- SLOT 1 : Coup
+            .pid(0.8, 0, 0.6, ClosedLoopSlot.kSlot1)
+            .outputRange(-1, 1, ClosedLoopSlot.kSlot1);
+
+        moteurRamasseur.configure(ramasseurConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        moteurRotationRamasseur.configure(rotationRamasseurConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    public void ramasserMode(){
-        interieurPidController.setSetpoint(-1500, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
-        exterieurPidController.setSetpoint(-1500, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+    public void ramasser() {
+        ramasseurPidController.setSetpoint(RamasseurConstants.kVitesseRamasseur, ControlType.kVelocity);
     }
 
-    public void sortirMode(){
-        interieurPidController.setSetpoint(1500, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
-        exterieurPidController.setSetpoint(1500, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+    public void rentrerRamasseur() {
+        isRamasseurDeployed = false;
+        targetPosition = RamasseurConstants.kRetractedPosition;
+        rotationRamasseurPidController.setSetpoint(targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
-    public void lancerMode(){
-        interieurPidController.setSetpoint(1500, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
-        exterieurPidController.setSetpoint(-1500, com.revrobotics.spark.SparkBase.ControlType.kVelocity);
+    public void sortirRamasseur() {
+        isRamasseurDeployed = true;
+        targetPosition = RamasseurConstants.kExtendedPosition;
+        rotationRamasseurPidController.setSetpoint(targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot0);
     }
 
-    public void stop(){
-        shaftInterieur.set(0);
-        shaftExterieur.set(0);
+    public void kickRamasseur() {
+        if (!isRamasseurDeployed) {
+            return;
+        }
+
+        targetPosition = RamasseurConstants.kMidPosition;
+        rotationRamasseurPidController.setSetpoint(targetPosition, ControlType.kPosition, ClosedLoopSlot.kSlot1);
+    }
+
+    public boolean isAtPosition() {
+        double current = moteurRotationRamasseur.getAbsoluteEncoder().getPosition();
+
+        SmartDashboard.putNumber("Encoder position", current);
+        SmartDashboard.putNumber("Target", targetPosition);
+
+        return Math.abs(targetPosition - current) < 0.1;
+    }
+
+    public void stop() {
+        moteurRamasseur.stopMotor();
     }
 }

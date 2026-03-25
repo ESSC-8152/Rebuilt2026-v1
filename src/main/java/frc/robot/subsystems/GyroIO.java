@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.studica.frc.AHRS;
+import frc.robot.Constants;
 import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -49,9 +50,32 @@ public class GyroIO {
      */
     public double getAngle() {
         if (m_realGyro != null) {
+            double yaw = m_realGyro.getYaw();
+            // Respect team constant for gyro direction. If kGyroReversed is true,
+            // invert the reported yaw so the rest of the codebase can rely on a
+            // consistent convention.
+            return Constants.DriveConstants.kGyroReversed ? -yaw : yaw;
+        }
+        return Constants.DriveConstants.kGyroReversed ? -m_simYaw : m_simYaw;
+    }
+
+    /**
+     * Returns the raw yaw value directly from the sensor (no kGyroReversed applied).
+     * Useful for diagnostics to distinguish sensor wiring/initialization issues
+     * from sign conventions applied by the code.
+     */
+    public double getRawAngle() {
+        if (m_realGyro != null) {
             return m_realGyro.getYaw();
         }
         return m_simYaw;
+    }
+
+    /**
+     * Indicates whether a real gyro (NavX) was initialized.
+     */
+    public boolean hasGyro() {
+        return m_realGyro != null;
     }
 
     /**

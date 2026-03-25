@@ -1,0 +1,133 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ToggleRamasseur"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Aller 1"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "En dessous 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Ramasse"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Transversal 1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArreteRamasse"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Transversal 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "revenir"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ToggleLanceur"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Feed"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "kick"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "kick"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "kick"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ToggleLanceur"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopFeeder"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": false,
+  "folder": null,
+  "choreoAuto": false
+}
