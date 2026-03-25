@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants.AutoConstants;
@@ -141,12 +140,6 @@ public class DriveSubsystem extends SubsystemBase {
 				Rotation2d.fromDegrees(getAngle()),
 				new SwerveModulePosition[] { avantGauche.getPosition(), avantDroite.getPosition(),
 						arriereGauche.getPosition(), arriereDroite.getPosition() });
-
-		// Affichage pour debug
-		SmartDashboard.putNumber("Angle Gyro", getAngle());
-		SmartDashboard.putNumber("Pose Estimator X", getPose().getX());
-		SmartDashboard.putNumber("Pose Estimator Y", getPose().getY());
-		SmartDashboard.putNumber("Pose Estimator Theta", getPose().getRotation().getDegrees());
 
 		// Intégration Limelight (position/orientation)
 		setLimelightRobotOrientation();
