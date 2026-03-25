@@ -18,6 +18,7 @@ import frc.robot.subsystems.LanceurSubsystem;
 import frc.robot.subsystems.Blinkin;
 import frc.robot.subsystems.RamasseurSubsystem;
 import frc.robot.commands.lanceur.ToggleLanceurCommand;
+import frc.robot.commands.drive.SetBoostModeCommand;
 import frc.robot.commands.lanceur.StartFeederCommand;
 import frc.robot.commands.lanceur.StopFeederCommand;
 import frc.robot.commands.leds.SetLedsDefault;
@@ -98,16 +99,16 @@ public class RobotContainer {
                 new RunCommand(
                         () ->
                                 m_robotDrive.conduire(
-                                        -MathUtil.applyDeadband(
+                                        MathUtil.applyDeadband(
                                                 m_driverController.getRawAxis(1),
                                                 OIConstants.kDriveDeadband),
-                                        -MathUtil.applyDeadband(
+                                        MathUtil.applyDeadband(
                                                 m_driverController.getRawAxis(0),
                                                 OIConstants.kDriveDeadband),
                                         -MathUtil.applyDeadband(
                                                 m_driverController.getRawAxis(4),
                                                 OIConstants.kDriveDeadband),
-                                        true, // fieldRelative : true si contrôle relatif au terrain
+                                        true,
                                         false),
                         m_robotDrive));
     }
@@ -126,6 +127,10 @@ public class RobotContainer {
         new Trigger(m_copiloteController::getLeftBumperButton)
                 .onTrue(new kickRamasseurCommand(m_rammasseur));
 
+        new Trigger(m_driverController::getBButton)
+                .onTrue(new SetBoostModeCommand(m_robotDrive, true))
+                .onFalse(new SetBoostModeCommand(m_robotDrive, false));
+
         new Trigger(m_driverController::getXButton)
                 .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
@@ -133,6 +138,25 @@ public class RobotContainer {
                 .whileTrue(
                         new RunCommand(
                                 () -> {
+
+                                    Boolean isOnGoodSide = m_robotDrive.isOnGoodSide();
+
+                                    if (!isOnGoodSide) {
+                                        m_robotDrive.conduire(
+                                                MathUtil.applyDeadband(
+                                                        m_driverController.getRawAxis(1),
+                                                        OIConstants.kDriveDeadband),
+                                                MathUtil.applyDeadband(
+                                                        m_driverController.getRawAxis(0),
+                                                        OIConstants.kDriveDeadband),
+                                                -MathUtil.applyDeadband(
+                                                        -m_driverController.getRawAxis(4),
+                                                        OIConstants.kDriveDeadband),
+                                                true,
+                                                false);
+                                        return;
+                                    }
+
                                     m_leds.set(SparkLedPattern.RED); // Couleur de tracking
 
                                     // Vitesses demandées (field-relative)
@@ -163,12 +187,11 @@ public class RobotContainer {
                                     double nx = dx / dist;
                                     double ny = dy / dist;
 
-                                    // Projection tangentielle : retirer la composante radiale
                                     double radial = vx * nx + vy * ny;
                                     double vxT = vx - radial * nx;
                                     double vyT = vy - radial * ny;
 
-                                    // Correction douce pour rester à rayon 1.5 m
+                                    // Correction
                                     double radiusError = dist - 2;
                                     double kR = 0.95; // gain radial
                                     double radialCorr = -kR * radiusError;
@@ -192,24 +215,6 @@ public class RobotContainer {
                                             MathUtil.applyDeadband(
                                                     m_robotDrive.getCompensationRotation(m_robotDrive.getAngleToBasket().getDegrees()),
                                                     0.01);
-
-                                    Boolean isOnGoodSide = m_robotDrive.isOnGoodSide();
-
-                                    if (!isOnGoodSide) {
-                                        m_robotDrive.conduire(
-                                                -MathUtil.applyDeadband(
-                                                        m_driverController.getRawAxis(1),
-                                                        OIConstants.kDriveDeadband),
-                                                -MathUtil.applyDeadband(
-                                                        m_driverController.getRawAxis(0),
-                                                        OIConstants.kDriveDeadband),
-                                                -MathUtil.applyDeadband(
-                                                        -m_driverController.getRawAxis(4),
-                                                        OIConstants.kDriveDeadband),
-                                                true, // fieldRelative : true si contrôle relatif au terrain
-                                                false);
-                                        return;
-                                    }
 
                                     m_robotDrive.conduire(vxCmd, vyCmd, rotCmd, true, false);
                                 },
