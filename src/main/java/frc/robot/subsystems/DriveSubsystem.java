@@ -241,7 +241,7 @@ public class DriveSubsystem extends SubsystemBase {
 	 */
 	public void resetToAllianceStartingPose() {
 		// (180° red / 0° blue)
-		double startHeading = isRedAlliance() ? 180.0 : 0.0;
+		double startHeading = isRedAlliance() ? 0.0 : 180.0;
 		Pose2d start = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(startHeading));
 		resetOdometry(start);
 	}
@@ -375,7 +375,7 @@ public class DriveSubsystem extends SubsystemBase {
             ),
             config,
             () -> {
-                return true;
+                return isRedAlliance() ? false : true;
             },
             this
     	);

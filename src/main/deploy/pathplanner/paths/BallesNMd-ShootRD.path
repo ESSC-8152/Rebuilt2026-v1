@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 9.0,
+        "x": 8.25,
         "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.424363636359782,
-        "y": 2.8806363636394154
+        "x": 10.61992976911455,
+        "y": 7.696084068528737
       },
       "isLocked": false,
-      "linkedName": "Balles RM"
+      "linkedName": "BallesNMd"
     },
     {
       "anchor": {
-        "x": 11.856772727272729,
-        "y": 0.6131363636363643
+        "x": 11.82585227272638,
+        "y": 7.415636363638097
       },
       "prevControl": {
-        "x": 9.816022727276042,
-        "y": 0.6131363636345624
+        "x": 10.888231760968798,
+        "y": 7.441497250931519
       },
       "nextControl": {
-        "x": 13.897626833890415,
-        "y": 0.6131363636381663
+        "x": 12.883302017006764,
+        "y": 7.386470418234414
       },
       "isLocked": false,
       "linkedName": null
@@ -33,20 +33,20 @@
     {
       "anchor": {
         "x": 13.35,
-        "y": 2.2
+        "y": 5.8
       },
       "prevControl": {
-        "x": 13.663307831877448,
-        "y": 1.192406424692084
+        "x": 14.13457954545365,
+        "y": 7.693920454547188
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "ShootRG"
+      "linkedName": "ShootRD"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 1.0253929866989107,
+      "waypointRelativePos": 0.9939540507859752,
       "rotationDegrees": 180.0
     }
   ],
@@ -63,13 +63,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 126.86999999999999
+    "rotation": -126.86999999999999
   },
   "reversed": false,
-  "folder": null,
+  "folder": "RougeDroit",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

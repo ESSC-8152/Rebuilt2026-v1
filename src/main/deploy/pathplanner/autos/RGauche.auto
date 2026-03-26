@@ -25,7 +25,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BallesRG-BallesRM"
+            "pathName": "BallesRG-BallesRMg"
           }
         },
         {
@@ -41,7 +41,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "BallesRM-ShootRG"
+                  "pathName": "BallesRMg-ShootRG"
                 }
               },
               {
@@ -136,7 +136,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "BallesNG-BallesNM"
+            "pathName": "BallesNG-BallesNMg"
           }
         },
         {
@@ -152,7 +152,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "BallesNM-ShootRG"
+                  "pathName": "BallesNMg-ShootRG"
                 }
               },
               {

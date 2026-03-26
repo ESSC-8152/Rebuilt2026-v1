@@ -3,37 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 12.104136363636364,
-        "y": 0.7
+        "x": 8.25,
+        "y": 1.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 11.712223563550813,
-        "y": 0.7
+        "x": 8.25,
+        "y": 2.4222706899245265
       },
       "isLocked": false,
-      "linkedName": "RGauche"
+      "linkedName": "Balles NG"
     },
     {
       "anchor": {
-        "x": 9.0,
-        "y": 0.7
+        "x": 8.25,
+        "y": 4.0
       },
       "prevControl": {
-        "x": 9.3,
-        "y": 0.7
+        "x": 8.25,
+        "y": 2.930345612642291
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "BallesRG"
+      "linkedName": "BallesNMg"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.3124409448818894,
-      "rotationDegrees": 0.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -47,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 89.44676378200639
   },
   "reversed": false,
   "folder": "RougeGauche",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

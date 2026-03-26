@@ -3,34 +3,34 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 12.104136363636364,
-        "y": 0.7
+        "x": 12.152560748499148,
+        "y": 7.4669921306803815
       },
       "prevControl": null,
       "nextControl": {
-        "x": 11.712223563550813,
-        "y": 0.7
+        "x": 10.870795180729472,
+        "y": 7.422590361450851
       },
       "isLocked": false,
-      "linkedName": "RGauche"
+      "linkedName": "RDroit"
     },
     {
       "anchor": {
         "x": 9.0,
-        "y": 0.7
+        "y": 7.3
       },
       "prevControl": {
-        "x": 9.3,
-        "y": 0.7
+        "x": 9.774795454544744,
+        "y": 7.357431818184728
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "BallesRG"
+      "linkedName": "BallesRD"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.3124409448818894,
+      "waypointRelativePos": 0.2204724409448824,
       "rotationDegrees": 0.0
     }
   ],
@@ -47,10 +47,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": "RougeGauche",
+  "folder": "RougeDroit",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 9.0,
-        "y": 0.7
+        "x": 8.25,
+        "y": 7.2095
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.0,
-        "y": 1.2346979432474403
+        "x": 8.25,
+        "y": 5.787229310075475
       },
       "isLocked": false,
-      "linkedName": "BallesRG"
+      "linkedName": "BallesND"
     },
     {
       "anchor": {
-        "x": 9.0,
+        "x": 8.25,
         "y": 4.0
       },
       "prevControl": {
-        "x": 9.0,
-        "y": 3.529056560872001
+        "x": 8.25,
+        "y": 5.0696543873577085
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "Balles RM"
+      "linkedName": "BallesNMd"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "RougeDroit",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }
