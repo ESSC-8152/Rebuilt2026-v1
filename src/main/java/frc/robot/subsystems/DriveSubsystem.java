@@ -161,9 +161,9 @@ public class DriveSubsystem extends SubsystemBase {
 			rot = rot * Math.abs(rot);
 		}
 
-		double xSpeedMeters = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond * (boostMode ? 1.25 : 1);
-		double ySpeedMeters = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond * (boostMode ? 1.25 : 1);
-		double rotRad = rot * DriveConstants.kMaxAngularSpeed * (boostMode ? 1.25 : 1);
+		double xSpeedMeters = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond * (boostMode ? 1.5 : 1);
+		double ySpeedMeters = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond * (boostMode ? 1.5 : 1);
+		double rotRad = rot * DriveConstants.kMaxAngularSpeed * (boostMode ? 1.5 : 1);
 
 		ChassisSpeeds speeds = fieldRelative
 			? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedMeters, ySpeedMeters, rotRad,
