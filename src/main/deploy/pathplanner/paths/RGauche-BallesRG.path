@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 13.5,
+        "x": 12.104136363636364,
         "y": 0.7
       },
       "prevControl": null,
       "nextControl": {
-        "x": 14.35101549319621,
-        "y": 0.6837464095833943
+        "x": 10.715137237699597,
+        "y": 0.3105852383510932
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "RGauche"
     },
     {
       "anchor": {
@@ -20,20 +20,15 @@
         "y": 0.7
       },
       "prevControl": {
-        "x": 8.447526953792629,
-        "y": 0.6878685444429232
+        "x": 9.774795454544744,
+        "y": 0.7574318181847286
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "BallesRG"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.6119402985074642,
-      "rotationDegrees": 0.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -53,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 16.526859745401342
   },
   "useDefaultConstraints": true
 }

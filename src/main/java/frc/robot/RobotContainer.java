@@ -192,7 +192,7 @@ public class RobotContainer {
                                     double vyT = vy - radial * ny;
 
                                     // Correction
-                                    double radiusError = dist - 2;
+                                    double radiusError = dist - 2.4;
                                     double kR = 0.95; // gain radial
                                     double radialCorr = -kR * radiusError;
 

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 9.0,
-        "y": 6.0
+        "x": 8.25,
+        "y": 1.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.0,
-        "y": 6.534697943247441
+        "x": 8.25,
+        "y": 2.4222706899245265
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Balles NG"
     },
     {
       "anchor": {
-        "x": 9.0,
-        "y": 0.7
+        "x": 8.25,
+        "y": 4.0
       },
       "prevControl": {
-        "x": 9.0,
-        "y": 1.170943439127998
+        "x": 8.25,
+        "y": 2.930345612642291
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "BallesNM"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 89.44676378200639
   },
   "reversed": false,
   "folder": null,

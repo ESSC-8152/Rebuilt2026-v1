@@ -24,7 +24,7 @@ public class kickRamasseurCommand extends Command{
     @Override
     public void end(boolean interrupted){
         CommandScheduler.getInstance().schedule(Commands.sequence(
-            new WaitCommand(1),
+            new WaitCommand(0.75),
             new InstantCommand(() -> m_ramasseur.sortirRamasseur())
         ));
     }

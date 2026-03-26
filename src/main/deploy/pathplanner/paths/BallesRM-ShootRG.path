@@ -4,31 +4,52 @@
     {
       "anchor": {
         "x": 9.0,
-        "y": 0.7
+        "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.0,
-        "y": 1.2346979432474403
+        "x": 9.424363636359782,
+        "y": 2.8806363636394154
+      },
+      "isLocked": false,
+      "linkedName": "Balles RM"
+    },
+    {
+      "anchor": {
+        "x": 11.856772727272729,
+        "y": 0.6131363636363643
+      },
+      "prevControl": {
+        "x": 9.816022727276042,
+        "y": 0.6131363636345624
+      },
+      "nextControl": {
+        "x": 13.897626833890415,
+        "y": 0.6131363636381663
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 9.0,
-        "y": 6.0
+        "x": 13.35,
+        "y": 2.2
       },
       "prevControl": {
-        "x": 9.0,
-        "y": 5.529056560872001
+        "x": 13.663307831877448,
+        "y": 1.192406424692084
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "ShootRG"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0253929866989107,
+      "rotationDegrees": 180.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -42,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 126.86999999999999
   },
   "reversed": false,
   "folder": null,

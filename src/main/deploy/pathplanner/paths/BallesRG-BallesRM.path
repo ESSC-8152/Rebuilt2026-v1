@@ -8,48 +8,27 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.504917255297249,
-        "y": 0.7811952968237327
+        "x": 9.0,
+        "y": 1.2346979432474403
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "BallesRG"
     },
     {
       "anchor": {
-        "x": 13.911255349500712,
-        "y": 0.7
+        "x": 9.0,
+        "y": 4.0
       },
       "prevControl": {
-        "x": 12.774494323347287,
-        "y": 0.49223136946046187
-      },
-      "nextControl": {
-        "x": 14.157181417290872,
-        "y": 0.7449485170085686
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 13.911255349500712,
-        "y": 2.517924865831842
-      },
-      "prevControl": {
-        "x": 13.977333297128405,
-        "y": 1.823186519566895
+        "x": 9.0,
+        "y": 3.529056560872001
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Balles RM"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1.0788912579957415,
-      "rotationDegrees": 0.0
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
@@ -63,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 141.3401917459099
+    "rotation": 90.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "useDefaultConstraints": true
 }

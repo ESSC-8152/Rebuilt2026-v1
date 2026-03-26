@@ -1,0 +1,75 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.25,
+        "y": 4.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 10.619954545452236,
+        "y": 0.3039318181806263
+      },
+      "isLocked": false,
+      "linkedName": "BallesNM"
+    },
+    {
+      "anchor": {
+        "x": 11.908306818181819,
+        "y": 0.6440568181818185
+      },
+      "prevControl": {
+        "x": 10.970686306424238,
+        "y": 0.6699177054752415
+      },
+      "nextControl": {
+        "x": 12.965756562462204,
+        "y": 0.6148908727781361
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 13.35,
+        "y": 2.2
+      },
+      "prevControl": {
+        "x": 13.639354802840508,
+        "y": 0.41118617111631117
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "ShootRG"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.9939540507859752,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 126.86999999999999
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 89.44676378200639
+  },
+  "useDefaultConstraints": true
+}
