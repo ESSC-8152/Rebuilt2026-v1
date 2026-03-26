@@ -1,8 +1,11 @@
 {
-  "robotWidth": 0.87,
-  "robotLength": 0.82,
+  "robotWidth": 0.89,
+  "robotLength": 0.84,
   "holonomicMode": true,
-  "pathFolders": [],
+  "pathFolders": [
+    "RougeDroit",
+    "RougeGauche"
+  ],
   "autoFolders": [],
   "defaultMaxVel": 1.0,
   "defaultMaxAccel": 2.0,
@@ -29,6 +32,6 @@
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
   "robotFeatures": [
-    "{\"name\":\"Ramasseur\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.5125,\"y\":0.0},\"size\":{\"width\":0.674,\"length\":0.205},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}"
+    "{\"name\":\"Ramasseur\",\"type\":\"rounded_rect\",\"data\":{\"center\":{\"x\":0.522,\"y\":0.0},\"size\":{\"width\":0.67,\"length\":0.205},\"borderRadius\":0.05,\"strokeWidth\":0.02,\"filled\":false}}"
   ]
 }

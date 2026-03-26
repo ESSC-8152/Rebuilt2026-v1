@@ -1,0 +1,75 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 13.35,
+        "y": 5.8
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 13.753227272727274,
+        "y": 7.72484090909091
+      },
+      "isLocked": false,
+      "linkedName": "ShootRD"
+    },
+    {
+      "anchor": {
+        "x": 12.145363636363635,
+        "y": 7.425943181818181
+      },
+      "prevControl": {
+        "x": 12.846227272727274,
+        "y": 7.477477272727273
+      },
+      "nextControl": {
+        "x": 11.332731929897587,
+        "y": 7.366190850460383
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.25,
+        "y": 7.2095
+      },
+      "prevControl": {
+        "x": 9.094545454545454,
+        "y": 7.2610340909090905
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "BallesND"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0737605804111243,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -90.0
+  },
+  "reversed": false,
+  "folder": "RougeDroit",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -126.86999999999999
+  },
+  "useDefaultConstraints": true
+}

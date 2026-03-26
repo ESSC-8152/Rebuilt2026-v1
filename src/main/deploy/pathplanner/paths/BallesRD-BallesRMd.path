@@ -4,28 +4,28 @@
     {
       "anchor": {
         "x": 9.0,
-        "y": 6.0
+        "y": 7.3
       },
       "prevControl": null,
       "nextControl": {
         "x": 9.0,
-        "y": 6.534697943247441
+        "y": 6.76530205675256
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "BallesRD"
     },
     {
       "anchor": {
         "x": 9.0,
-        "y": 0.7
+        "y": 4.0
       },
       "prevControl": {
         "x": 9.0,
-        "y": 1.170943439127998
+        "y": 4.470943439127999
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "BallesRMd"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -90.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "RougeDroit",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }
