@@ -105,7 +105,13 @@ public class DriveSubsystem extends SubsystemBase {
 
 		PathPlannerLogging.setLogActivePathCallback((poses) -> {
 			field2d.getObject("activePath").setPoses(poses);
+
+			Logger.recordOutput("Odometry/ActivePath", poses.toArray(new Pose2d[0]));
 		});
+
+		PathPlannerLogging.setLogTargetPoseCallback((pose) -> {
+            Logger.recordOutput("Odometry/TargetPose", pose);
+        });
 	}
 
 	@Override
