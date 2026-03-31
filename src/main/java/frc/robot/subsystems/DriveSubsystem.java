@@ -17,6 +17,7 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -28,37 +29,29 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import org.littletonrobotics.junction.Logger;
+
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.LimelightHelpers;
+import frc.robot.subsystems.io.GyroIO;
+import frc.robot.subsystems.io.GyroIOInputsAutoLogged;
+import frc.robot.subsystems.io.SwerveModuleIO;
 
 public class DriveSubsystem extends SubsystemBase {
 
 	// ----- Modules swerve -----
-	private final MAXSwerveModule avantGauche = new MAXSwerveModule(
-			DriveConstants.kFrontLeftDrivingCanId,
-			DriveConstants.kFrontLeftTurningCanId,
-			DriveConstants.kFrontLeftChassisAngularOffset);
-
-	private final MAXSwerveModule avantDroite = new MAXSwerveModule(
-			DriveConstants.kFrontRightDrivingCanId,
-			DriveConstants.kFrontRightTurningCanId,
-			DriveConstants.kFrontRightChassisAngularOffset);
-
-	private final MAXSwerveModule arriereGauche = new MAXSwerveModule(
-			DriveConstants.kRearLeftDrivingCanId,
-			DriveConstants.kRearLeftTurningCanId,
-			DriveConstants.kBackLeftChassisAngularOffset);
-
-	private final MAXSwerveModule arriereDroite = new MAXSwerveModule(
-			DriveConstants.kRearRightDrivingCanId,
-			DriveConstants.kRearRightTurningCanId,
-			DriveConstants.kBackRightChassisAngularOffset);
+	private final MAXSwerveModule avantGauche;
+	private final MAXSwerveModule avantDroite;
+	private final MAXSwerveModule arriereGauche;
+	private final MAXSwerveModule arriereDroite;
 
 	// ----- Gyro -----
-	private final GyroIO m_gyro = new GyroIO();
+	private final GyroIO m_gyroIO;
+	private final GyroIOInputsAutoLogged m_gyroInputs = new GyroIOInputsAutoLogged();
 
-	// ----- Pose estimator (initialisé dans le constructeur) -----
+	// ----- Pose estimator -----
 	private SwerveDrivePoseEstimator poseEstimator;
 
 	// ----- Affichage sur le terrain -----
@@ -73,12 +66,22 @@ public class DriveSubsystem extends SubsystemBase {
 	// En attendant que le Driver Station se connecte
 	private boolean allianceInitDone = false;
 
-	public DriveSubsystem() {
-		// Initialisation des encodeurs / odométrie
+	public DriveSubsystem(GyroIO gyroIO, SwerveModuleIO flIO, SwerveModuleIO frIO, SwerveModuleIO blIO, SwerveModuleIO brIO) {
+		this.m_gyroIO = gyroIO;
+
+		// Initialisation des modules avec leurs IO respectives
+		this.avantGauche = new MAXSwerveModule("AvantGauche", flIO, DriveConstants.kFrontLeftChassisAngularOffset);
+		this.avantDroite = new MAXSwerveModule("AvantDroite", frIO, DriveConstants.kFrontRightChassisAngularOffset);
+		this.arriereGauche = new MAXSwerveModule("ArriereGauche", blIO, DriveConstants.kBackLeftChassisAngularOffset);
+		this.arriereDroite = new MAXSwerveModule("ArriereDroite", brIO, DriveConstants.kBackRightChassisAngularOffset);
+
+		// Première lecture du gyro pour initialiser l'odométrie
+		m_gyroIO.updateInputs(m_gyroInputs);
+
 		resetEncoders();
 
 		thetaController.enableContinuousInput(-180, 180);
-        thetaController.setTolerance(1);
+		thetaController.setTolerance(1);
 
 		poseEstimator = new SwerveDrivePoseEstimator(
 				DriveConstants.kDriveKinematics,
@@ -87,12 +90,8 @@ public class DriveSubsystem extends SubsystemBase {
 						arriereGauche.getPosition(), arriereDroite.getPosition() },
 				Pose2d.kZero);
 
-		// Réinitialiser l'odométrie à l'origine par défaut mais aligner
-		// l'orientation avec le gyro instantané afin d'avoir la bonne
-		// heading au démarrage.
 		resetOdometry(new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(getAngle())));
 
-		// Register field on SmartDashboard
 		SmartDashboard.putData("Field", field2d);
 
 		RobotConfig config;
@@ -111,7 +110,19 @@ public class DriveSubsystem extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// Mettre à jour l'estimation de pose avec les positions de modules
+		if (!edu.wpi.first.wpilibj.RobotBase.isReal()) {
+			ChassisSpeeds vitesses = DriveConstants.kDriveKinematics.toChassisSpeeds(getModuleStates());
+			m_gyroIO.addSimulatedAngularVelocity(vitesses.omegaRadiansPerSecond);
+		}
+
+		m_gyroIO.updateInputs(m_gyroInputs);
+		Logger.processInputs("Drive/Gyro", m_gyroInputs);
+
+		avantGauche.periodic();
+		avantDroite.periodic();
+		arriereGauche.periodic();
+		arriereDroite.periodic();
+
 		poseEstimator.update(
 				Rotation2d.fromDegrees(getAngle()),
 				new SwerveModulePosition[] { avantGauche.getPosition(), avantDroite.getPosition(),
@@ -120,26 +131,28 @@ public class DriveSubsystem extends SubsystemBase {
 		addVisionPosition("limelight-front");
 		addVisionPosition("limelight-back");
 
-		// appliquer l'orientation de départ basée sur l'alliance
 		if (!allianceInitDone) {
 			var maybeAlliance = DriverStation.getAlliance();
 			if (maybeAlliance.isPresent()) {
-				// (0° blue / 180° red)
 				resetToAllianceStartingPose();
 				allianceInitDone = true;
 			} 
 		} 
 
-		// Mettre à jour la vue Field2d
+		Pose2d currentPose = poseEstimator.getEstimatedPosition();
+		Logger.recordOutput("Odometry/RobotPose2d", currentPose);
+		Pose3d robotPose3d = new Pose3d(currentPose); 
+		Logger.recordOutput("Odometry/RobotPose3d", robotPose3d);
 		field2d.setRobotPose(getPose());
+
+		Logger.recordOutput("SwerveStates/Measured", getModuleStates());
 	}
 
 	// ----- Commande des modules -----
 
-	/**
-	 * Envoie les états désirés à chaque module.
-	 */
 	public void setModuleStates(SwerveModuleState[] desiredStates) {
+		Logger.recordOutput("SwerveStates/Setpoints", desiredStates);
+
 		avantGauche.setDesiredState(desiredStates[0]);
 		avantDroite.setDesiredState(desiredStates[1]);
 		arriereGauche.setDesiredState(desiredStates[2]);
@@ -151,9 +164,6 @@ public class DriveSubsystem extends SubsystemBase {
 				arriereGauche.getState(), arriereDroite.getState() };
 	}
 
-	/**
-	 * Conduite
-	 */
 	public void conduire(double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean squared) {
 		if (squared) {
 			xSpeed = xSpeed * Math.abs(xSpeed);
@@ -177,9 +187,6 @@ public class DriveSubsystem extends SubsystemBase {
 		setModuleStates(DriveConstants.kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0)));
 	}
 
-	/**
-	 * Positionner les roues en X pour arreter le robot.
-	 */
 	public void setX() {
 		avantGauche.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
 		avantDroite.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
@@ -225,7 +232,6 @@ public class DriveSubsystem extends SubsystemBase {
 			doRejectUpdate = true;
 		}
 		
-		
 		SmartDashboard.putBoolean(nomComplet, !doRejectUpdate);
 		if (!doRejectUpdate) {
 			poseEstimator.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
@@ -236,11 +242,7 @@ public class DriveSubsystem extends SubsystemBase {
 		resetOdometry(new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(getAngle())));
 	}
 
-	/**
-	 * change l'orientation de départ du robot en fonction de l'alliance
-	 */
 	public void resetToAllianceStartingPose() {
-		// (180° red / 0° blue)
 		double startHeading = isRedAlliance() ? 0.0 : 180.0;
 		Pose2d start = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(startHeading));
 		resetOdometry(start);
@@ -258,15 +260,16 @@ public class DriveSubsystem extends SubsystemBase {
 	// ----- Gyro -----
 
 	public double getAngle() {
-		return m_gyro.getAngle();
+		// On lit l'angle depuis AdvantageKit, converti de Radians à Degrés
+		return Units.radiansToDegrees(m_gyroInputs.yawPositionRad);
 	}
 
 	public double getRate() {
-		return m_gyro.getRate();
+		return Units.radiansToDegrees(m_gyroInputs.yawVelocityRadPerSec);
 	}
 
 	public void resetGyro() {
-		m_gyro.reset();
+		m_gyroIO.reset();
 	}
 
 	// ----- Path planner helpers -----
@@ -287,15 +290,10 @@ public class DriveSubsystem extends SubsystemBase {
 
 	// ----- Alliance -----
 
-	/**
-	 * Vérifie si l'alliance est rouge. Appeler souvent car l'alliance peut être
-	 * initialisée après le boot.
-	 */
 	public boolean isRedAlliance() {
 		Optional<Alliance> ally = DriverStation.getAlliance();
 		if (ally.isPresent()) {
 			return ally.get() == Alliance.Red;
-
 		} else {
 			return false;
 		}
@@ -365,19 +363,19 @@ public class DriveSubsystem extends SubsystemBase {
 
 	public void configureAutoBuilder(RobotConfig config) {
 		AutoBuilder.configure(
-            this::getPose,
-            this::resetPose,
-            this::getRobotRelativeSpeeds,
-            (speeds, feedforwards) -> conduireChassis(speeds),
-            new PPHolonomicDriveController(
-                    new PIDConstants(1.5, 0.0, 0.0),
-                    new PIDConstants(6, 0.0, 0.05)
-            ),
-            config,
-            () -> {
-                return isRedAlliance() ? false : true;
-            },
-            this
-    	);
+			this::getPose,
+			this::resetPose,
+			this::getRobotRelativeSpeeds,
+			(speeds, feedforwards) -> conduireChassis(speeds),
+			new PPHolonomicDriveController(
+					new PIDConstants(1.5, 0.0, 0.0),
+					new PIDConstants(6, 0.0, 0.05)
+			),
+			config,
+			() -> {
+				return isRedAlliance() ? false : true;
+			},
+			this
+		);
 	}
 }
