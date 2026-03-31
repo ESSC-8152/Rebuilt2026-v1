@@ -21,8 +21,6 @@ public class LanceurSubsystem extends SubsystemBase {
     private final SparkClosedLoopController lanceurPidController;
     private final SparkClosedLoopController feederPidController;
 
-
-
     private boolean lanceurEnMarche = false;
 
     public LanceurSubsystem() {
@@ -95,19 +93,23 @@ public class LanceurSubsystem extends SubsystemBase {
         if (lanceurEnMarche) {
             startLanceurLent();
         } else {
-            lanceurPidController.setSetpoint(LanceurConstants.kVitesseLanceur, ControlType.kVelocity);
-            lanceurEnMarche = true;
+            startLanceur();
         }
+    }
+
+    public void startLanceur(){
+        lanceurPidController.setSetpoint(LanceurConstants.kVitesseLanceur, ControlType.kVelocity);
+        lanceurEnMarche = true;
+    }    
+
+    public void startLanceurLent() {
+        lanceurPidController.setSetpoint(LanceurConstants.kVitesseLanceurLent, ControlType.kVelocity);
+        lanceurEnMarche = false;
     }
 
     public void startFeeder(double speed) {
         feederPidController.setSetpoint(LanceurConstants.kVitesseFeeder * speed, ControlType.kVelocity);
         courroiesPidController.setSetpoint(LanceurConstants.kVitesseCourroies * speed, ControlType.kVelocity);
-    }
-
-    public void startLanceurLent() {
-        lanceurPidController.setSetpoint(LanceurConstants.kVitesseLanceurLent, ControlType.kVelocity);
-        lanceurEnMarche = false;
     }
 
     public void arreterFeeder() {

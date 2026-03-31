@@ -18,6 +18,7 @@ import frc.robot.subsystems.LanceurSubsystem;
 import frc.robot.subsystems.Blinkin;
 import frc.robot.subsystems.RamasseurSubsystem;
 import frc.robot.commands.lanceur.ToggleLanceurCommand;
+import frc.robot.commands.auto.ShootAllCommand;
 import frc.robot.commands.drive.SetBoostModeCommand;
 import frc.robot.commands.lanceur.StartFeederCommand;
 import frc.robot.commands.lanceur.StopFeederCommand;
@@ -27,6 +28,7 @@ import frc.robot.commands.ramasseur.RamasserCommand;
 import frc.robot.commands.ramasseur.StopRamasserCommand;
 import frc.robot.commands.ramasseur.ToggleSortirRamasseurCommand;
 import frc.robot.commands.ramasseur.kickRamasseurCommand;
+import frc.robot.commands.ramasseur.kickRamasseurPasSortir;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -73,6 +75,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("StopFeeder", new StopFeederCommand(m_lanceur));
         NamedCommands.registerCommand("ToggleRamasseur", new ToggleSortirRamasseurCommand(m_rammasseur));
         NamedCommands.registerCommand("kick", new kickRamasseurCommand(m_rammasseur));
+        NamedCommands.registerCommand("Vider", new ShootAllCommand(m_lanceur, m_rammasseur));
 
         configureButtonBindings();
         configureDefaultCommands();
@@ -125,9 +128,9 @@ public class RobotContainer {
                 .onTrue(new ToggleSortirRamasseurCommand(m_rammasseur));
 
         new Trigger(m_copiloteController::getLeftBumperButton)
-                .onTrue(new kickRamasseurCommand(m_rammasseur));
+                .whileTrue(new kickRamasseurPasSortir(m_rammasseur));
 
-        new Trigger(m_driverController::getBButton)
+        new Trigger(m_driverController::getRightBumperButton)
                 .onTrue(new SetBoostModeCommand(m_robotDrive, true))
                 .onFalse(new SetBoostModeCommand(m_robotDrive, false));
 

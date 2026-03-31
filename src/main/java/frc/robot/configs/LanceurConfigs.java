@@ -14,25 +14,25 @@ public final class LanceurConfigs {
         public static final SparkFlexConfig courroiesConfig = new SparkFlexConfig();
         
         static {
-            double kVelocityFeedForward = 12 / VortexMotorConstants.kVortexMotorFreeSpeedRpm;
+            double kVelocityFeedForward = 12.2 / VortexMotorConstants.kVortexMotorFreeSpeedRpm;
 
             // --------------------------------------------------------------
             // Configuration du lanceur (grosses roues)
             // --------------------------------------------------------------
             lanceurGaucheConfig
-                .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(60);
+                .idleMode(IdleMode.kCoast)
+                .smartCurrentLimit(80);
 
             lanceurGaucheConfig.closedLoop
                 .feedbackSensor(com.revrobotics.spark.FeedbackSensor.kPrimaryEncoder)
-                .p(0.00001)
+                .p(0.0005)
                 .i(0.0)
                 .d(0.0)
                 .outputRange(-1, 1)
                 .feedForward.kV(kVelocityFeedForward);
 
             lanceurGaucheConfig.signals
-                .primaryEncoderVelocityPeriodMs(20);
+                .primaryEncoderVelocityPeriodMs(5);
 
             lanceurDroitConfig.follow(LanceurConstants.kMoteurGaucheLanceurID, true);
     

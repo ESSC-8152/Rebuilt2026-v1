@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -17,11 +18,14 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -55,6 +59,8 @@ public class DriveSubsystem extends SubsystemBase {
 			DriveConstants.kRearRightTurningCanId,
 			DriveConstants.kBackRightChassisAngularOffset);
 
+	StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault().getStructTopic("MyPose", Pose2d.struct).publish();
+
 	// ----- Gyro -----
 	private final GyroIO m_gyro = new GyroIO();
 
@@ -74,6 +80,7 @@ public class DriveSubsystem extends SubsystemBase {
 	private boolean allianceInitDone = false;
 
 	public DriveSubsystem() {
+		allianceInitDone = false;
 		// Initialisation des encodeurs / odométrie
 		resetEncoders();
 
@@ -130,8 +137,14 @@ public class DriveSubsystem extends SubsystemBase {
 			} 
 		} 
 
-		// Mettre à jour la vue Field2d
-		field2d.setRobotPose(getPose());
+		Pose2d currentPose = poseEstimator.getEstimatedPosition();
+
+		Logger.recordOutput("Odometry/RobotPose2d", currentPose);
+
+		Pose3d robotPose3d = new Pose3d(currentPose); 
+		Logger.recordOutput("Odometry/RobotPose3d", robotPose3d);
+		
+		field2d.setRobotPose(currentPose);
 	}
 
 	// ----- Commande des modules -----
@@ -161,9 +174,9 @@ public class DriveSubsystem extends SubsystemBase {
 			rot = rot * Math.abs(rot);
 		}
 
-		double xSpeedMeters = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond * (boostMode ? 1.5 : 1);
-		double ySpeedMeters = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond * (boostMode ? 1.5 : 1);
-		double rotRad = rot * DriveConstants.kMaxAngularSpeed * (boostMode ? 1.5 : 1);
+		double xSpeedMeters = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond * (boostMode ? 2.0 : 1.0);
+		double ySpeedMeters = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond * (boostMode ? 2.0 : 1.0);
+		double rotRad = rot * DriveConstants.kMaxAngularSpeed * (boostMode ? 2.0 : 1.0);
 
 		ChassisSpeeds speeds = fieldRelative
 			? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedMeters, ySpeedMeters, rotRad,
@@ -206,12 +219,12 @@ public class DriveSubsystem extends SubsystemBase {
 
 	// ----- Limelight helpers -----
 	public void addVisionPosition(String nomComplet) {
-		double yaw = isRedAlliance() ? getAngle() : getAngle() + 180;
+		double yaw = getAngle();
 		LimelightHelpers.SetRobotOrientation(nomComplet, yaw, 0, 0, 0, 0, 0);
 
 		poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 9999999));
 
-		LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(nomComplet);
+		LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(nomComplet);
 
 		boolean doRejectUpdate = false;
 
