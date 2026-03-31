@@ -8,20 +8,16 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OIConstants;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.LanceurSubsystem;
-import frc.robot.subsystems.Blinkin;
-import frc.robot.subsystems.RamasseurSubsystem;
-import frc.robot.commands.lanceur.ToggleLanceurCommand;
 import frc.robot.commands.auto.ShootAllCommand;
 import frc.robot.commands.drive.SetBoostModeCommand;
 import frc.robot.commands.lanceur.StartFeederCommand;
 import frc.robot.commands.lanceur.StopFeederCommand;
+import frc.robot.commands.lanceur.ToggleLanceurCommand;
 import frc.robot.commands.leds.SetLedsDefault;
 import frc.robot.commands.leds.SetLedsRamasser;
 import frc.robot.commands.ramasseur.RamasserCommand;
@@ -29,6 +25,24 @@ import frc.robot.commands.ramasseur.StopRamasserCommand;
 import frc.robot.commands.ramasseur.ToggleSortirRamasseurCommand;
 import frc.robot.commands.ramasseur.kickRamasseurCommand;
 import frc.robot.commands.ramasseur.kickRamasseurPasSortir;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.LanceurSubsystem;
+import frc.robot.subsystems.Blinkin;
+import frc.robot.subsystems.RamasseurSubsystem;
+import frc.robot.subsystems.io.GyroIO;
+import frc.robot.subsystems.io.GyroIONavX;
+import frc.robot.subsystems.io.GyroIOSim;
+import frc.robot.subsystems.io.LanceurIO;
+import frc.robot.subsystems.io.LanceurIOReal;
+import frc.robot.subsystems.io.LanceurIOSim;
+import frc.robot.subsystems.io.RamasseurIO;
+import frc.robot.subsystems.io.RamasseurIOReal;
+import frc.robot.subsystems.io.RamasseurIOSim;
+import frc.robot.subsystems.io.SwerveModuleIO;
+import frc.robot.subsystems.io.SwerveModuleIOReal;
+import frc.robot.subsystems.io.SwerveModuleIOSim;
+import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -45,14 +59,14 @@ public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
     // Sous-système du châssis (drive)
-    final DriveSubsystem m_robotDrive = new DriveSubsystem();
+    final DriveSubsystem m_robotDrive;
 
     // Sous-système des LEDs
     private final Blinkin m_leds = new Blinkin();
 
     // Subsystem du lanceur + ramasseur
-    final RamasseurSubsystem m_rammasseur = new RamasseurSubsystem();
-    private final LanceurSubsystem m_lanceur = new LanceurSubsystem();
+    final RamasseurSubsystem m_rammasseur;
+    private final LanceurSubsystem m_lanceur;
 
     // Manette du conducteur
     private final XboxController m_driverController =
@@ -66,6 +80,38 @@ public class RobotContainer {
      * Constructeur : configure les bindings et la commande par défaut.
      */
     public RobotContainer() {
+        if (RobotBase.isReal()) {
+            m_robotDrive = new DriveSubsystem(
+                new GyroIONavX(),
+                new SwerveModuleIOReal(DriveConstants.kFrontLeftDrivingCanId, DriveConstants.kFrontLeftTurningCanId, DriveConstants.kFrontLeftChassisAngularOffset),
+                new SwerveModuleIOReal(DriveConstants.kFrontRightDrivingCanId, DriveConstants.kFrontRightTurningCanId, DriveConstants.kFrontRightChassisAngularOffset),
+                new SwerveModuleIOReal(DriveConstants.kRearLeftDrivingCanId, DriveConstants.kRearLeftTurningCanId, DriveConstants.kBackLeftChassisAngularOffset),
+                new SwerveModuleIOReal(DriveConstants.kRearRightDrivingCanId, DriveConstants.kRearRightTurningCanId, DriveConstants.kBackRightChassisAngularOffset)
+            );
+            m_lanceur = new LanceurSubsystem(new LanceurIOReal());
+            m_rammasseur = new RamasseurSubsystem(new RamasseurIOReal());
+        } else if (!Constants.kIsReplay) {
+            m_robotDrive = new DriveSubsystem(
+                new GyroIOSim(),
+                new SwerveModuleIOSim(DriveConstants.kFrontLeftChassisAngularOffset),
+                new SwerveModuleIOSim(DriveConstants.kFrontRightChassisAngularOffset),
+                new SwerveModuleIOSim(DriveConstants.kBackLeftChassisAngularOffset),
+                new SwerveModuleIOSim(DriveConstants.kBackRightChassisAngularOffset)
+            );
+            m_lanceur = new LanceurSubsystem(new LanceurIOSim());
+            m_rammasseur = new RamasseurSubsystem(new RamasseurIOSim());
+        } else {
+            m_robotDrive = new DriveSubsystem(
+                new GyroIO() {},
+                new SwerveModuleIO() {},
+                new SwerveModuleIO() {},
+                new SwerveModuleIO() {},
+                new SwerveModuleIO() {}
+            );
+            m_lanceur = new LanceurSubsystem(new LanceurIO() {});
+            m_rammasseur = new RamasseurSubsystem(new RamasseurIO() {});
+        }
+
         m_leds.set(SparkLedPattern.GREEN); // Couleur par défaut
 
         NamedCommands.registerCommand("Ramasse", Commands.sequence(new RamasserCommand(m_rammasseur), new SetLedsRamasser(m_leds)));

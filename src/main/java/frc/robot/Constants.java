@@ -183,5 +183,7 @@ public final class Constants {
     public static final double kRetractedPosition = 0;
     public static final double kMidPosition = Math.PI/3;
   }
+
+  public static final boolean kIsReplay = false; // Set to true to enable replay mode (requires log files in "logs" directory)
 }
 

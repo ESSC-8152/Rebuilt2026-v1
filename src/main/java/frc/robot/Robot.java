@@ -4,11 +4,13 @@
 
 package frc.robot;
 
-import edu.wpi.first.epilogue.Epilogue;
-import edu.wpi.first.epilogue.EpilogueConfiguration;
-import edu.wpi.first.epilogue.Logged;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -17,8 +19,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the TimedRobot documentation. If you change the name of this class or the package after creating
  * this project, you must also update the Main.java file in the project.
  */
-@Logged
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
@@ -28,6 +29,22 @@ public class Robot extends TimedRobot {
    * initialization code.
    */
   public Robot() {
+    Logger.recordMetadata("ESSC-8152 Rebuilt 2026", "Rebuilt2026");
+
+    if (isReal()) {
+        Logger.addDataReceiver(new WPILOGWriter());
+        Logger.addDataReceiver(new NT4Publisher());
+    } else if (!Constants.kIsReplay) {
+        Logger.addDataReceiver(new NT4Publisher());
+    } else {
+        setUseTiming(false); 
+        String logPath = LogFileUtil.findReplayLog(); 
+        Logger.setReplaySource(new WPILOGReader(logPath)); 
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+    }
+
+    Logger.start();
+
     m_robotContainer = new RobotContainer();
   }
 
