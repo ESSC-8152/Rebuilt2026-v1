@@ -34,17 +34,17 @@ public class LanceurSubsystem extends SubsystemBase {
     }
 
     public void startLanceur(){
-        lanceurPidController.setSetpoint(LanceurConstants.kVitesseLanceur, ControlType.kVelocity);
+        io.setLanceurVelocityRPM(LanceurConstants.kVitesseLanceur);
         lanceurEnMarche = true;
     }    
 
-    public void startLanceurLent() {
-        lanceurPidController.setSetpoint(LanceurConstants.kVitesseLanceurLent, ControlType.kVelocity);
-        lanceurEnMarche = false;
-    }
-
     public void startFeeder(double speed) {
         io.setFeederVelocityRPM(LanceurConstants.kVitesseFeeder * speed, LanceurConstants.kVitesseCourroies * speed);
+    }
+
+    public void startLanceurLent() {
+        io.setLanceurVelocityRPM(LanceurConstants.kVitesseLanceurLent);
+        lanceurEnMarche = false;
     }
 
     public void arreterFeeder() {

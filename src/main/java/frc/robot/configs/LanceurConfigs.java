@@ -27,7 +27,7 @@ public final class LanceurConfigs {
                 .feedbackSensor(com.revrobotics.spark.FeedbackSensor.kPrimaryEncoder)
                 .p(0.0005)
                 .i(0.0)
-                .d(0.0)
+                .d(0.024)
                 .outputRange(-1, 1)
                 .feedForward.kV(kVelocityFeedForward);
 
@@ -60,7 +60,7 @@ public final class LanceurConfigs {
             courroiesConfig
                 .idleMode(IdleMode.kCoast)
                 .smartCurrentLimit(30)
-                .inverted(true);
+                .inverted(false);
 
             courroiesConfig.closedLoop
                 .feedbackSensor(com.revrobotics.spark.FeedbackSensor.kPrimaryEncoder)
