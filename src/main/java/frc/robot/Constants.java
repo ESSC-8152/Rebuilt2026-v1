@@ -184,6 +184,15 @@ public final class Constants {
     public static final double kMidPosition = Math.PI/3;
   }
 
+  public static final class ClimberConstants {
+    // ID des moteurs
+    public static final int kMoteurClimberID = 16;
+
+    //Positions du climber
+    public static final double kClimberUpPosition = 6 * Math.PI; // Ajuster
+    public static final double kClimberDownPosition = 0; 
+  }
+
   public static final boolean kIsReplay = false; // Set to true to enable replay mode (requires log files in "logs" directory)
 }
 

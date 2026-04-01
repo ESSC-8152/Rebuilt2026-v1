@@ -26,8 +26,8 @@ public class RamasseurIOReal implements RamasseurIO {
         ramasseurPidController = moteurRamasseur.getClosedLoopController();
         rotationRamasseurPidController = moteurRotationRamasseur.getClosedLoopController();
 
-        moteurRamasseur.configure(RamasseurConfigs.RamasseurSubsystem.ramasseurConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        moteurRotationRamasseur.configure(RamasseurConfigs.RamasseurSubsystem.rotationRamasseurConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        moteurRamasseur.configure(RamasseurConfigs.ramasseurConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        moteurRotationRamasseur.configure(RamasseurConfigs.rotationRamasseurConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
