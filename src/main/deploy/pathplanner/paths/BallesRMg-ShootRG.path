@@ -3,16 +3,32 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 9.5,
-        "y": 5.0
+        "x": 8.75,
+        "y": 3.5
       },
       "prevControl": null,
       "nextControl": {
-        "x": 9.3054578313253,
-        "y": 1.767614457831324
+        "x": 9.073931818181817,
+        "y": 4.065920454545455
       },
       "isLocked": false,
       "linkedName": "BallesRMg"
+    },
+    {
+      "anchor": {
+        "x": 10.187068181818184,
+        "y": 3.5
+      },
+      "prevControl": {
+        "x": 9.888170454545454,
+        "y": 4.3451590909090925
+      },
+      "nextControl": {
+        "x": 10.36664062093319,
+        "y": 2.992243448019642
+      },
+      "isLocked": false,
+      "linkedName": null
     },
     {
       "anchor": {
@@ -46,11 +62,19 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7170124481327844,
+      "waypointRelativePos": 0.5,
       "rotationDegrees": 0.0
     },
     {
-      "waypointRelativePos": 1.0253929866989107,
+      "waypointRelativePos": 0.9286577992744853,
+      "rotationDegrees": -84.36412620164732
+    },
+    {
+      "waypointRelativePos": 1.3204353083434095,
+      "rotationDegrees": -77.63452898287181
+    },
+    {
+      "waypointRelativePos": 2.0253929866989107,
       "rotationDegrees": 0.0
     }
   ],
@@ -59,9 +83,9 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 1.0,
-    "maxAcceleration": 1.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 720.0,
+    "maxAngularAcceleration": 1080.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
@@ -73,7 +97,7 @@
   "folder": "RougeGauche",
   "idealStartingState": {
     "velocity": 1.0,
-    "rotation": 90.0
+    "rotation": 80.0
   },
   "useDefaultConstraints": true
 }
