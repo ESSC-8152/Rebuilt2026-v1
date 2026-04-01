@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.auto.ShootAllCommand;
+import frc.robot.commands.climb.climbCommand;
 import frc.robot.commands.drive.SetBoostModeCommand;
 import frc.robot.commands.lanceur.StartFeederCommand;
 import frc.robot.commands.lanceur.StopFeederCommand;
@@ -29,7 +30,11 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.LanceurSubsystem;
 import frc.robot.subsystems.Blinkin;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.RamasseurSubsystem;
+import frc.robot.subsystems.io.ClimberIO;
+import frc.robot.subsystems.io.ClimberIOReal;
+import frc.robot.subsystems.io.ClimberIOSim;
 import frc.robot.subsystems.io.GyroIO;
 import frc.robot.subsystems.io.GyroIONavX;
 import frc.robot.subsystems.io.GyroIOSim;
@@ -58,10 +63,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
     private final SendableChooser<Command> autoChooser;
 
-    // Sous-système du châssis (drive)
+    // Sous-système de drive
     final DriveSubsystem m_robotDrive;
 
-    // Sous-système des LEDs
+    // Sous-système de l'accrocheur
+    final ClimberSubsystem m_climber;
+
+    // Sous-système des LED
     private final Blinkin m_leds = new Blinkin();
 
     // Subsystem du lanceur + ramasseur
@@ -76,9 +84,6 @@ public class RobotContainer {
     private final XboxController m_copiloteController = 
             new XboxController(OIConstants.kCopiloteControllerPort);
 
-    /**
-     * Constructeur : configure les bindings et la commande par défaut.
-     */
     public RobotContainer() {
         if (RobotBase.isReal()) {
             m_robotDrive = new DriveSubsystem(
@@ -90,6 +95,7 @@ public class RobotContainer {
             );
             m_lanceur = new LanceurSubsystem(new LanceurIOReal());
             m_rammasseur = new RamasseurSubsystem(new RamasseurIOReal());
+            m_climber = new ClimberSubsystem(new ClimberIOReal());
         } else if (!Constants.kIsReplay) {
             m_robotDrive = new DriveSubsystem(
                 new GyroIOSim(),
@@ -100,6 +106,7 @@ public class RobotContainer {
             );
             m_lanceur = new LanceurSubsystem(new LanceurIOSim());
             m_rammasseur = new RamasseurSubsystem(new RamasseurIOSim());
+            m_climber = new ClimberSubsystem(new ClimberIOSim());
         } else {
             m_robotDrive = new DriveSubsystem(
                 new GyroIO() {},
@@ -110,6 +117,7 @@ public class RobotContainer {
             );
             m_lanceur = new LanceurSubsystem(new LanceurIO() {});
             m_rammasseur = new RamasseurSubsystem(new RamasseurIO() {});
+            m_climber = new ClimberSubsystem(new ClimberIO() {});
         }
 
         m_leds.set(SparkLedPattern.GREEN); // Couleur par défaut
@@ -175,6 +183,9 @@ public class RobotContainer {
 
         new Trigger(m_copiloteController::getLeftBumperButton)
                 .whileTrue(new kickRamasseurPasSortir(m_rammasseur));
+
+        new Trigger(m_driverController::getXButton)
+                .whileTrue(new climbCommand(m_climber));
 
         new Trigger(m_driverController::getRightBumperButton)
                 .onTrue(new SetBoostModeCommand(m_robotDrive, true))

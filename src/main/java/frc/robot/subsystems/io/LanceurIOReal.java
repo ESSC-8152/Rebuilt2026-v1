@@ -30,10 +30,10 @@ public class LanceurIOReal implements LanceurIO {
         feederPidController = moteurFeeder.getClosedLoopController();
         lanceurPidController = moteurGaucheLanceur.getClosedLoopController();
 
-        moteurGaucheLanceur.configure(LanceurConfigs.LanceurSubsystem.lanceurGaucheConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        moteurDroitLanceur.configure(LanceurConfigs.LanceurSubsystem.lanceurDroitConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        moteurFeeder.configure(LanceurConfigs.LanceurSubsystem.feederConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        moteurCourroies.configure(LanceurConfigs.LanceurSubsystem.courroiesConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        moteurGaucheLanceur.configure(LanceurConfigs.lanceurGaucheConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        moteurDroitLanceur.configure(LanceurConfigs.lanceurDroitConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        moteurFeeder.configure(LanceurConfigs.feederConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        moteurCourroies.configure(LanceurConfigs.courroiesConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
