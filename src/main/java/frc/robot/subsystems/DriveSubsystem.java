@@ -57,7 +57,7 @@ public class DriveSubsystem extends SubsystemBase {
 	private final Field2d field2d = new Field2d();
 
 	// ----- Contrôleurs PID -----
-	private final PIDController thetaController = new PIDController(7, 0.0, 0.05);
+	private final PIDController thetaController = DriveConstants.thetaController;
 
 	// ----- Mode Boost -----
 	private boolean boostMode = false;
@@ -137,12 +137,17 @@ public class DriveSubsystem extends SubsystemBase {
 		addVisionPosition("limelight-back");
 
 		if (!allianceInitDone) {
-			var maybeAlliance = DriverStation.getAlliance();
-			if (maybeAlliance.isPresent()) {
-				resetToAllianceStartingPose();
-				allianceInitDone = true;
-			} 
-		} 
+            var maybeAlliance = DriverStation.getAlliance();
+            if (maybeAlliance.isPresent()) {
+                boolean visionSuccess = initializeOdometryFromVision();
+                
+                if (!visionSuccess) {
+                    resetToAllianceStartingPose();
+                }
+                
+                allianceInitDone = true;
+            } 
+        }
 
 		Pose2d currentPose = poseEstimator.getEstimatedPosition();
 		Logger.recordOutput("Odometry/RobotPose2d", currentPose);
@@ -218,30 +223,39 @@ public class DriveSubsystem extends SubsystemBase {
 
 	// ----- Limelight helpers -----
 	public void addVisionPosition(String nomComplet) {
-		double yaw = getAngle();
-		LimelightHelpers.SetRobotOrientation(nomComplet, yaw, 0, 0, 0, 0, 0);
+        double yaw = getPose().getRotation().getDegrees();
+        LimelightHelpers.SetRobotOrientation(nomComplet, yaw, 0, 0, 0, 0, 0);
 
-		poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(0.5, 0.5, 9999999));
+        LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(nomComplet);
 
-		LimelightHelpers.PoseEstimate poseEstimate = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(nomComplet);
+        if (poseEstimate == null || poseEstimate.tagCount == 0) {
+            SmartDashboard.putBoolean(nomComplet + "/Valid", false);
+            return;
+        }
 
-		boolean doRejectUpdate = false;
+        if (Math.abs(getRate()) > 720) {
+            SmartDashboard.putBoolean(nomComplet + "/Valid", false);
+            return;
+        }
 
-		if (poseEstimate == null){
-			return;
-		}
-		if (Math.abs(getRate()) > 720) {
-			doRejectUpdate = true;
-		}
-		if (poseEstimate.tagCount == 0) {
-			doRejectUpdate = true;
-		}
-		
-		SmartDashboard.putBoolean(nomComplet, !doRejectUpdate);
-		if (!doRejectUpdate) {
-			poseEstimator.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
-		}
-	}
+        double distance = poseEstimate.pose.getTranslation().getNorm();
+        double xyStdDev = 0.5;
+
+        if (poseEstimate.tagCount == 1) {
+            if (distance > 4.0) {
+                xyStdDev = 2.0; 
+            } else if (distance > 3.0) {
+                xyStdDev = 1.0;
+            }
+        } else {
+            xyStdDev = 0.3;
+        }
+
+        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(xyStdDev, xyStdDev, 9999999));
+
+        poseEstimator.addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds);
+        SmartDashboard.putBoolean(nomComplet + "/Valid", true);
+    }
 
 	public void setZeroPosition() {
 		resetOdometry(new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(getAngle())));
@@ -252,6 +266,38 @@ public class DriveSubsystem extends SubsystemBase {
 		Pose2d start = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(startHeading));
 		resetOdometry(start);
 	}
+
+	public boolean initializeOdometryFromVision() {
+		if (!edu.wpi.first.wpilibj.RobotBase.isReal()) {
+            Pose2d fakeVisionPose = new Pose2d(2.5, 3.0, Rotation2d.fromDegrees(90));
+            resetOdometry(fakeVisionPose);
+            return true; 
+        }
+
+        LimelightHelpers.PoseEstimate frontEst = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-front");
+        LimelightHelpers.PoseEstimate backEst = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight-back");
+
+        LimelightHelpers.PoseEstimate bestEst = null;
+
+        if (frontEst != null && frontEst.tagCount > 0) {
+            bestEst = frontEst;
+        }
+
+        if (backEst != null && backEst.tagCount > 0) {
+            if (bestEst == null || backEst.tagCount > bestEst.tagCount) {
+                bestEst = backEst;
+            }
+        }
+
+        if (bestEst != null) {
+            resetOdometry(bestEst.pose);
+            SmartDashboard.putBoolean("Vision/AlignedAtStart", true);
+            return true;
+        }
+
+        SmartDashboard.putBoolean("Vision/AlignedAtStart", false);
+        return false;
+    }
 
 	// ----- Encodeurs -----
 
@@ -265,7 +311,6 @@ public class DriveSubsystem extends SubsystemBase {
 	// ----- Gyro -----
 
 	public double getAngle() {
-		// On lit l'angle depuis AdvantageKit, converti de Radians à Degrés
 		return Units.radiansToDegrees(m_gyroInputs.yawPositionRad);
 	}
 

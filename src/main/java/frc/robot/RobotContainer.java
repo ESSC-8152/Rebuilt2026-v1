@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.auto.AutoClimbSequence;
 import frc.robot.commands.auto.ShootAllCommand;
-import frc.robot.commands.climb.climbCommand;
 import frc.robot.commands.drive.SetBoostModeCommand;
 import frc.robot.commands.lanceur.StartFeederCommand;
 import frc.robot.commands.lanceur.StopFeederCommand;
@@ -185,14 +185,14 @@ public class RobotContainer {
                 .whileTrue(new kickRamasseurPasSortir(m_rammasseur));
 
         new Trigger(m_driverController::getXButton)
-                .whileTrue(new climbCommand(m_climber));
+                .whileTrue(AutoClimbSequence.getClimbSequence(m_robotDrive));
 
         new Trigger(m_driverController::getRightBumperButton)
                 .onTrue(new SetBoostModeCommand(m_robotDrive, true))
                 .onFalse(new SetBoostModeCommand(m_robotDrive, false));
 
-        new Trigger(m_driverController::getXButton)
-                .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
+        // new Trigger(m_driverController::getXButton)
+        //         .whileTrue(new RunCommand(() -> m_robotDrive.setX(), m_robotDrive));
 
         new Trigger(m_driverController::getLeftBumperButton)
                 .whileTrue(
