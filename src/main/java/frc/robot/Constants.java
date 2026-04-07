@@ -117,8 +117,8 @@ public final class Constants {
   }
 
   public static final class AutoConstants {
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 0.25;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
@@ -126,8 +126,8 @@ public final class Constants {
     public static final double kPYController = 1.0;
     public static final double kPThetaController = 1.0;
 
-    public static final double kBasketXRed = 4.6256;
-    public static final double kBasketXBlue = 11.9154;
+    public static final double kBasketXRed = 11.9154;
+    public static final double kBasketXBlue = 4.6256;
     public static final double kBasketY = 4.0;
 
     // Constraint for the motion profiled robot angle controller
@@ -157,6 +157,7 @@ public final class Constants {
     // Vitesses (rpm)
     public static final int kVitesseLanceurLent = 500;
     public static final int kVitesseLanceur = 3000;
+    public static final int kVitesseLanceurVite = 5000;
     public static final int kVitesseFeeder = 5000;
     public static final double kVitesseCourroies = 3500;
     public static final int kMoteurFeederBaseID = 14;
@@ -189,8 +190,11 @@ public final class Constants {
     public static final int kMoteurClimberID = 16;
 
     //Positions du climber
-    public static final double kClimberUpPosition = 6 * Math.PI; // Ajuster
-    public static final double kClimberDownPosition = 0; 
+    public static final double kClimberUpPosition = 16; // Ajuster
+    public static final double kClimberAccrochePosition = 0.25;
+    public static final double kClimberDownPosition = 0;
+
+    public static int kHomeSwitchPort = 0; 
   }
 
   public static final boolean kIsReplay = false; // Set to true to enable replay mode (requires log files in "logs" directory)

@@ -12,6 +12,7 @@ public class LanceurSubsystem extends SubsystemBase {
     private final LanceurIOInputsAutoLogged inputs = new LanceurIOInputsAutoLogged();
 
     private boolean lanceurEnMarche = false;
+    private boolean lanceurVite = false;
 
     public LanceurSubsystem(LanceurIO io) {
         this.io = io;
@@ -28,8 +29,16 @@ public class LanceurSubsystem extends SubsystemBase {
         if (lanceurEnMarche) {
             startLanceurLent();
         } else {
-            io.setLanceurVelocityRPM(LanceurConstants.kVitesseLanceur);
+            io.setLanceurVelocityRPM(lanceurVite ? LanceurConstants.kVitesseLanceurVite : LanceurConstants.kVitesseLanceur);
             lanceurEnMarche = true;
+        }
+    }
+
+    public void toggleViteMode(){
+        if (lanceurVite){
+            lanceurVite = false;
+        } else {
+            lanceurVite = true;
         }
     }
 

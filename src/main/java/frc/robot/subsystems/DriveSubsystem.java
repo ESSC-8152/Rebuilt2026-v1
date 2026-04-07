@@ -57,7 +57,7 @@ public class DriveSubsystem extends SubsystemBase {
 	private final Field2d field2d = new Field2d();
 
 	// ----- Contrôleurs PID -----
-	private final PIDController thetaController = new PIDController(7, 0.0, 0.05);
+	private final PIDController thetaController = new PIDController(0.067, 0.0, 0.0);
 
 	// ----- Mode Boost -----
 	private boolean boostMode = false;
@@ -352,7 +352,7 @@ public class DriveSubsystem extends SubsystemBase {
 
 		boolean isOnGoodSide = isRed ? (robotX < basketX - 0.2) : (robotX > basketX + 0.2);
 
-		return isOnGoodSide; 
+		return !isOnGoodSide; 
 	}
 
 	public double getCompensationRotation(double targetAngleDegrees) {

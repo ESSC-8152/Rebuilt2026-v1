@@ -4,23 +4,28 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.auto.ShootAllCommand;
-import frc.robot.commands.climb.climbCommand;
+import frc.robot.commands.climb.ClimbCommand;
+import frc.robot.commands.climb.HomingSequence;
 import frc.robot.commands.drive.SetBoostModeCommand;
 import frc.robot.commands.lanceur.StartFeederCommand;
 import frc.robot.commands.lanceur.StopFeederCommand;
 import frc.robot.commands.lanceur.ToggleLanceurCommand;
-import frc.robot.commands.leds.SetLedsDefault;
-import frc.robot.commands.leds.SetLedsRamasser;
+import frc.robot.commands.lanceur.ToggleViteModeCommand;
 import frc.robot.commands.ramasseur.RamasserCommand;
 import frc.robot.commands.ramasseur.StopRamasserCommand;
 import frc.robot.commands.ramasseur.ToggleSortirRamasseurCommand;
@@ -29,12 +34,11 @@ import frc.robot.commands.ramasseur.kickRamasseurPasSortir;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.LanceurSubsystem;
-import frc.robot.subsystems.Blinkin;
+import frc.robot.subsystems.Leds;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.RamasseurSubsystem;
 import frc.robot.subsystems.io.ClimberIO;
 import frc.robot.subsystems.io.ClimberIOReal;
-import frc.robot.subsystems.io.ClimberIOSim;
 import frc.robot.subsystems.io.GyroIO;
 import frc.robot.subsystems.io.GyroIONavX;
 import frc.robot.subsystems.io.GyroIOSim;
@@ -70,7 +74,7 @@ public class RobotContainer {
     final ClimberSubsystem m_climber;
 
     // Sous-système des LED
-    private final Blinkin m_leds = new Blinkin();
+    private final Leds m_leds = new Leds(0, 59);
 
     // Subsystem du lanceur + ramasseur
     final RamasseurSubsystem m_rammasseur;
@@ -106,7 +110,7 @@ public class RobotContainer {
             );
             m_lanceur = new LanceurSubsystem(new LanceurIOSim());
             m_rammasseur = new RamasseurSubsystem(new RamasseurIOSim());
-            m_climber = new ClimberSubsystem(new ClimberIOSim());
+            m_climber = new ClimberSubsystem(new ClimberIO() {});
         } else {
             m_robotDrive = new DriveSubsystem(
                 new GyroIO() {},
@@ -120,10 +124,8 @@ public class RobotContainer {
             m_climber = new ClimberSubsystem(new ClimberIO() {});
         }
 
-        m_leds.set(SparkLedPattern.GREEN); // Couleur par défaut
-
-        NamedCommands.registerCommand("Ramasse", Commands.sequence(new RamasserCommand(m_rammasseur), new SetLedsRamasser(m_leds)));
-        NamedCommands.registerCommand("ArreteRamasse", Commands.sequence(new StopRamasserCommand(m_rammasseur), new SetLedsDefault(m_leds)));
+        NamedCommands.registerCommand("Ramasse", new RamasserCommand(m_rammasseur));
+        NamedCommands.registerCommand("ArreteRamasse", new StopRamasserCommand(m_rammasseur));
         NamedCommands.registerCommand("ToggleLanceur", new ToggleLanceurCommand(m_lanceur));
         NamedCommands.registerCommand("Feed", new StartFeederCommand(m_lanceur));
         NamedCommands.registerCommand("StopFeeder", new StopFeederCommand(m_lanceur));
@@ -144,8 +146,15 @@ public class RobotContainer {
      * et appel à la méthode "conduire" du sous-système.
      */
     private void configureDefaultCommands() {
-        // Lecture des axes, application d'un deadband, et mise à l'échelle par les constantes de vitesse.
-        // La méthode conduire(x, y, rot, fieldRelative, autreFlag) est appelée régulièrement.
+        m_leds.setDefaultCommand(m_leds.setDynamicAllianceCommand(() -> {
+                var alliance = DriverStation.getAlliance();
+                Logger.recordOutput("Alliance", alliance.get());
+                if (alliance.isPresent()) {
+                        return alliance.get() == Alliance.Red ? Color.kRed : Color.kBlue;
+                }
+                return Color.kGreen;
+        }));
+
         m_lanceur.setDefaultCommand(
                 new RunCommand(
                         () -> 
@@ -171,9 +180,11 @@ public class RobotContainer {
     }
 
     private void configureButtonBindings() {
+
+
         new Trigger(m_copiloteController::getBButton)
-                .onTrue(Commands.sequence(new RamasserCommand(m_rammasseur), new SetLedsRamasser(m_leds)))
-                .onFalse(Commands.sequence(new StopRamasserCommand(m_rammasseur), new SetLedsDefault(m_leds)));
+                .onTrue(Commands.sequence(new RamasserCommand(m_rammasseur)))
+                .onFalse(Commands.sequence(new StopRamasserCommand(m_rammasseur)));
 
         new Trigger(m_copiloteController::getYButton)
                 .onTrue(new ToggleLanceurCommand(m_lanceur));
@@ -184,8 +195,14 @@ public class RobotContainer {
         new Trigger(m_copiloteController::getLeftBumperButton)
                 .whileTrue(new kickRamasseurPasSortir(m_rammasseur));
 
-        new Trigger(m_driverController::getXButton)
-                .whileTrue(new climbCommand(m_climber));
+        new Trigger(m_copiloteController::getXButton)
+                .whileTrue(new ClimbCommand(m_climber));
+
+        new Trigger(m_copiloteController::getStartButton)
+                .onTrue(HomingSequence.getCommand(m_climber));
+
+        new Trigger(m_copiloteController::getAButton)
+                .whileTrue(new ToggleViteModeCommand(m_lanceur));
 
         new Trigger(m_driverController::getRightBumperButton)
                 .onTrue(new SetBoostModeCommand(m_robotDrive, true))
@@ -217,15 +234,15 @@ public class RobotContainer {
                                         return;
                                     }
 
-                                    m_leds.set(SparkLedPattern.RED); // Couleur de tracking
+                                    m_leds.setStrobe(Color.kGreen, 0.2);
 
                                     // Vitesses demandées (field-relative)
                                     double vx =
-                                            -MathUtil.applyDeadband(
+                                            MathUtil.applyDeadband(
                                                     m_driverController.getRawAxis(1),
                                                     OIConstants.kDriveDeadband);
                                     double vy =
-                                            -MathUtil.applyDeadband(
+                                            MathUtil.applyDeadband(
                                                     m_driverController.getRawAxis(0),
                                                     OIConstants.kDriveDeadband);
 
@@ -252,11 +269,21 @@ public class RobotContainer {
                                     double vyT = vy - radial * ny;
 
                                     // Correction
-                                    double radiusError = dist - 2.4;
+                                    double radiusError = dist - 2.8;
                                     double kR = 0.95; // gain radial
                                     double radialCorr = -kR * radiusError;
+                                    double angleError = m_robotDrive.getAngleToBasket().getDegrees();
 
-                                    SmartDashboard.putNumber("Radius Error", radiusError);
+                                    boolean isAtCorrectRadius = Math.abs(radiusError) < 0.10; // 10 cm de marge
+                                    boolean isAligned = Math.abs(angleError) < 2.5;           // 2.5 degrés de marge
+                                        
+                                    boolean isInPosition = isAtCorrectRadius && isAligned;
+
+                                    if (!isInPosition) {
+                                        m_leds.setStrobeAlliance(0.2);
+                                    } else {
+                                        m_leds.setStrobe(Color.kGreen, 0.2);
+                                    }
 
                                     double vxCmd = vxT + radialCorr * nx;
                                     double vyCmd = vyT + radialCorr * ny;
@@ -274,12 +301,11 @@ public class RobotContainer {
                                     double rotCmd =
                                             MathUtil.applyDeadband(
                                                     m_robotDrive.getCompensationRotation(m_robotDrive.getAngleToBasket().getDegrees()),
-                                                    0.01);
+                                                    0.05);
 
                                     m_robotDrive.conduire(vxCmd, vyCmd, rotCmd, true, false);
                                 },
-                                m_robotDrive))
-                .onFalse(new SetLedsDefault(m_leds));
+                                m_robotDrive));
     }
 
     public Command getAutonomousCommand() {
