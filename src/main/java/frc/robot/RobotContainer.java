@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.auto.AutoClimbSequence;
 import frc.robot.commands.auto.ShootAllCommand;
 import frc.robot.commands.climb.ClimbCommand;
 import frc.robot.commands.climb.HomingSequence;

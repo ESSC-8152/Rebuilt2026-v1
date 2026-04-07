@@ -12,8 +12,6 @@ public class ClimberSubsystem extends SubsystemBase {
     private ClimberIO io;
     private ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
 
-    private final double GRAVITY_HOLD_VOLTAGE = -1.5;
-
     private boolean estGrimpe = false;
 
     @Override
