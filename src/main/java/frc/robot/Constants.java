@@ -6,6 +6,9 @@ package frc.robot;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -27,6 +30,10 @@ public final class Constants {
   public static final class DriveConstants {
     public static final double kMaxSpeedMetersPerSecond = 2;
     public static final double kMaxAngularSpeed = Math.PI; // radians per second
+
+    public static final PIDController xController = new PIDController(0.5, 0.0, 0.0);
+    public static final PIDController yController = new PIDController(0.5, 0.0, 0.0);
+    public static final PIDController thetaController = new PIDController(0.67, 0.0, 0.05);
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(25);
@@ -129,6 +136,8 @@ public final class Constants {
     public static final double kBasketXRed = 11.9154;
     public static final double kBasketXBlue = 4.6256;
     public static final double kBasketY = 4.0;
+
+    public static final Pose2d kClimbPose = new Pose2d(15.572, 3.430, new Rotation2d(Math.PI));
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
